@@ -61,6 +61,14 @@ export const stockFormSchema = z.object({
 });
 export type StockFormInput = z.infer<typeof stockFormSchema>;
 
+export const transferFormSchema = z.object({
+  productId: z.coerce.number().int().positive(),
+  quantity: z.coerce.number().int().nonnegative(),
+  sendingWarehouseId: z.coerce.number().int().positive(),
+  receivingWarehouseId: z.coerce.number().int().positive(),
+});
+export type TransferFormInput = z.infer<typeof transferFormSchema>;
+
 // Types from domain schemas
 export type Product = z.infer<typeof productSchema>;
 export type Warehouse = z.infer<typeof warehouseSchema>;
