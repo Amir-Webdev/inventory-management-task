@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -10,37 +10,37 @@ import {
   Paper,
   AppBar,
   Toolbar,
-} from '@mui/material';
-import InventoryIcon from '@mui/icons-material/Inventory';
+} from "@mui/material";
+import InventoryIcon from "@mui/icons-material/Inventory";
 
-export default function AddProduct() {
-  const [product, setProduct] = useState({
-    sku: '',
-    name: '',
-    category: '',
-    unitCost: '',
-    reorderPoint: '',
+interface WarehouseFormData {
+  name: string;
+  location: string;
+  code: string;
+}
+
+export default function AddWarehouse() {
+  const [warehouse, setWarehouse] = useState<WarehouseFormData>({
+    name: "",
+    location: "",
+    code: "",
   });
 
   const router = useRouter();
 
-  const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWarehouse({ ...warehouse, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...product,
-        unitCost: parseFloat(product.unitCost),
-        reorderPoint: parseInt(product.reorderPoint),
-      }),
+    const res = await fetch("/api/warehouses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(warehouse),
     });
     if (res.ok) {
-      router.push('/products');
+      router.push("/warehouses");
     }
   };
 
@@ -70,72 +70,55 @@ export default function AddProduct() {
       <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Add New Product
+            Add New Warehouse
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 2 }}
+          >
             <TextField
               margin="normal"
               required
               fullWidth
-              label="SKU"
-              name="sku"
-              value={product.sku}
+              label="Warehouse Code"
+              name="code"
+              value={warehouse.code}
               onChange={handleChange}
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              label="Product Name"
+              label="Warehouse Name"
               name="name"
-              value={product.name}
+              value={warehouse.name}
               onChange={handleChange}
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              label="Category"
-              name="category"
-              value={product.category}
+              label="Location"
+              name="location"
+              value={warehouse.location}
               onChange={handleChange}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Unit Cost"
-              name="unitCost"
-              type="number"
-              inputProps={{ step: '0.01', min: '0' }}
-              value={product.unitCost}
-              onChange={handleChange}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Reorder Point"
-              name="reorderPoint"
-              type="number"
-              inputProps={{ min: '0' }}
-              value={product.reorderPoint}
-              onChange={handleChange}
-            />
-            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+            <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
               >
-                Add Product
+                Add Warehouse
               </Button>
               <Button
                 fullWidth
                 variant="outlined"
                 component={Link}
-                href="/products"
+                href="/warehouses"
               >
                 Cancel
               </Button>
@@ -146,4 +129,3 @@ export default function AddProduct() {
     </>
   );
 }
-

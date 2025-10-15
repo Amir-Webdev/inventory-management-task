@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -20,17 +20,18 @@ import {
   AppBar,
   Toolbar,
   Box,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { Stock, Product, Warehouse } from "../../types";
 
-export default function Stock() {
-  const [stock, setStock] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
+export default function StockPage() {
+  const [stock, setStock] = useState<Stock[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [open, setOpen] = useState(false);
-  const [selectedStockId, setSelectedStockId] = useState(null);
+  const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -38,9 +39,9 @@ export default function Stock() {
 
   const fetchData = () => {
     Promise.all([
-      fetch('/api/stock').then(res => res.json()),
-      fetch('/api/products').then(res => res.json()),
-      fetch('/api/warehouses').then(res => res.json()),
+      fetch("/api/stock").then((res) => res.json()),
+      fetch("/api/products").then((res) => res.json()),
+      fetch("/api/warehouses").then((res) => res.json()),
     ]).then(([stockData, productsData, warehousesData]) => {
       setStock(stockData);
       setProducts(productsData);
@@ -48,17 +49,17 @@ export default function Stock() {
     });
   };
 
-  const getProductName = (productId) => {
-    const product = products.find(p => p.id === productId);
-    return product ? `${product.name} (${product.sku})` : 'Unknown';
+  const getProductName = (productId: number): string => {
+    const product = products.find((p) => p.id === productId);
+    return product ? `${product.name} (${product.sku})` : "Unknown";
   };
 
-  const getWarehouseName = (warehouseId) => {
-    const warehouse = warehouses.find(w => w.id === warehouseId);
-    return warehouse ? `${warehouse.name} (${warehouse.code})` : 'Unknown';
+  const getWarehouseName = (warehouseId: number): string => {
+    const warehouse = warehouses.find((w) => w.id === warehouseId);
+    return warehouse ? `${warehouse.name} (${warehouse.code})` : "Unknown";
   };
 
-  const handleClickOpen = (id) => {
+  const handleClickOpen = (id: number) => {
     setSelectedStockId(id);
     setOpen(true);
   };
@@ -71,7 +72,7 @@ export default function Stock() {
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/stock/${selectedStockId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (res.ok) {
@@ -79,7 +80,7 @@ export default function Stock() {
         handleClose();
       }
     } catch (error) {
-      console.error('Error deleting stock:', error);
+      console.error("Error deleting stock:", error);
     }
   };
 
@@ -107,14 +108,21 @@ export default function Stock() {
       </AppBar>
 
       <Container sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Typography variant="h4" component="h1">
             Stock Levels
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            component={Link} 
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
             href="/stock/add"
           >
             Add Stock Record
@@ -125,10 +133,18 @@ export default function Stock() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>Product</strong></TableCell>
-                <TableCell><strong>Warehouse</strong></TableCell>
-                <TableCell align="right"><strong>Quantity</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
+                <TableCell>
+                  <strong>Product</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Warehouse</strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>Quantity</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Actions</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -171,7 +187,8 @@ export default function Stock() {
           <DialogTitle>Delete Stock Record</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Are you sure you want to delete this stock record? This action cannot be undone.
+              Are you sure you want to delete this stock record? This action
+              cannot be undone.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -187,4 +204,3 @@ export default function Stock() {
     </>
   );
 }
-

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -17,22 +17,23 @@ import {
   Paper,
   AppBar,
   Toolbar,
-} from '@mui/material';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import WarehouseIcon from '@mui/icons-material/Warehouse';
-import CategoryIcon from '@mui/icons-material/Category';
+} from "@mui/material";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
+import CategoryIcon from "@mui/icons-material/Category";
+import { Product, Warehouse, Stock, InventoryOverview } from "../types";
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
-  const [stock, setStock] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [stock, setStock] = useState<Stock[]>([]);
 
   useEffect(() => {
     // Fetch all data
     Promise.all([
-      fetch('/api/products').then(res => res.json()),
-      fetch('/api/warehouses').then(res => res.json()),
-      fetch('/api/stock').then(res => res.json()),
+      fetch("/api/products").then((res) => res.json()),
+      fetch("/api/warehouses").then((res) => res.json()),
+      fetch("/api/stock").then((res) => res.json()),
     ]).then(([productsData, warehousesData, stockData]) => {
       setProducts(productsData);
       setWarehouses(warehousesData);
@@ -42,13 +43,13 @@ export default function Home() {
 
   // Calculate total inventory value
   const totalValue = stock.reduce((sum, item) => {
-    const product = products.find(p => p.id === item.productId);
+    const product = products.find((p) => p.id === item.productId);
     return sum + (product ? product.unitCost * item.quantity : 0);
   }, 0);
 
   // Get products with stock across all warehouses
-  const inventoryOverview = products.map(product => {
-    const productStock = stock.filter(s => s.productId === product.id);
+  const inventoryOverview: InventoryOverview[] = products.map((product) => {
+    const productStock = stock.filter((s) => s.productId === product.id);
     const totalQuantity = productStock.reduce((sum, s) => sum + s.quantity, 0);
     return {
       ...product,
@@ -87,8 +88,8 @@ export default function Home() {
           <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CategoryIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <CategoryIcon sx={{ mr: 1, color: "primary.main" }} />
                   <Typography variant="h6">Total Products</Typography>
                 </Box>
                 <Typography variant="h3">{products.length}</Typography>
@@ -98,8 +99,8 @@ export default function Home() {
           <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <WarehouseIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <WarehouseIcon sx={{ mr: 1, color: "primary.main" }} />
                   <Typography variant="h6">Warehouses</Typography>
                 </Box>
                 <Typography variant="h3">{warehouses.length}</Typography>
@@ -109,8 +110,8 @@ export default function Home() {
           <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <InventoryIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <InventoryIcon sx={{ mr: 1, color: "primary.main" }} />
                   <Typography variant="h6">Total Inventory Value</Typography>
                 </Box>
                 <Typography variant="h3">${totalValue.toFixed(2)}</Typography>
@@ -127,20 +128,32 @@ export default function Home() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>SKU</strong></TableCell>
-                <TableCell><strong>Product Name</strong></TableCell>
-                <TableCell><strong>Category</strong></TableCell>
-                <TableCell align="right"><strong>Total Stock</strong></TableCell>
-                <TableCell align="right"><strong>Reorder Point</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
+                <TableCell>
+                  <strong>SKU</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Product Name</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Category</strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>Total Stock</strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>Reorder Point</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Status</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {inventoryOverview.map((item) => (
-                <TableRow 
+                <TableRow
                   key={item.id}
-                  sx={{ 
-                    backgroundColor: item.isLowStock ? '#fff3e0' : 'inherit' 
+                  sx={{
+                    backgroundColor: item.isLowStock ? "#fff3e0" : "inherit",
                   }}
                 >
                   <TableCell>{item.sku}</TableCell>
@@ -154,9 +167,7 @@ export default function Home() {
                         Low Stock
                       </Typography>
                     ) : (
-                      <Typography color="success.main">
-                        In Stock
-                      </Typography>
+                      <Typography color="success.main">In Stock</Typography>
                     )}
                   </TableCell>
                 </TableRow>
@@ -168,4 +179,3 @@ export default function Home() {
     </>
   );
 }
-

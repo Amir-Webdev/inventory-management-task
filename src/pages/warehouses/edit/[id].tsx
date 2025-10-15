@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -10,33 +10,73 @@ import {
   Paper,
   AppBar,
   Toolbar,
-} from '@mui/material';
-import InventoryIcon from '@mui/icons-material/Inventory';
+  CircularProgress,
+} from "@mui/material";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { Warehouse } from "../../../types";
 
-export default function AddWarehouse() {
-  const [warehouse, setWarehouse] = useState({
-    name: '',
-    location: '',
-    code: '',
+interface WarehouseFormData {
+  name: string;
+  location: string;
+  code: string;
+}
+
+export default function EditWarehouse() {
+  const [warehouse, setWarehouse] = useState<WarehouseFormData>({
+    name: "",
+    location: "",
+    code: "",
   });
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
+  const { id } = router.query;
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/warehouses/${id}`)
+        .then((res) => res.json())
+        .then((data: Warehouse) => {
+          setWarehouse({
+            name: data.name,
+            location: data.location,
+            code: data.code,
+          });
+          setLoading(false);
+        });
+    }
+  }, [id]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWarehouse({ ...warehouse, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/warehouses', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(`/api/warehouses/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(warehouse),
     });
     if (res.ok) {
-      router.push('/warehouses');
+      router.push("/warehouses");
     }
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -64,9 +104,14 @@ export default function AddWarehouse() {
       <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Add New Warehouse
+            Edit Warehouse
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 2 }}
+          >
             <TextField
               margin="normal"
               required
@@ -94,14 +139,14 @@ export default function AddWarehouse() {
               value={warehouse.location}
               onChange={handleChange}
             />
-            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+            <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
               >
-                Add Warehouse
+                Update Warehouse
               </Button>
               <Button
                 fullWidth
@@ -118,4 +163,3 @@ export default function AddWarehouse() {
     </>
   );
 }
-

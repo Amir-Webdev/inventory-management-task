@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -20,27 +20,30 @@ import {
   AppBar,
   Toolbar,
   Box,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { Product } from "../../types";
 
 export default function Products() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = () => {
-    fetch('/api/products')
+    fetch("/api/products")
       .then((res) => res.json())
-      .then((data) => setProducts(data));
+      .then((data: Product[]) => setProducts(data));
   };
 
-  const handleClickOpen = (id) => {
+  const handleClickOpen = (id: number) => {
     setSelectedProductId(id);
     setOpen(true);
   };
@@ -53,15 +56,17 @@ export default function Products() {
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/products/${selectedProductId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (res.ok) {
-        setProducts(products.filter((product) => product.id !== selectedProductId));
+        setProducts(
+          products.filter((product) => product.id !== selectedProductId)
+        );
         handleClose();
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
@@ -89,14 +94,21 @@ export default function Products() {
       </AppBar>
 
       <Container sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Typography variant="h4" component="h1">
             Products
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            component={Link} 
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
             href="/products/add"
           >
             Add Product
@@ -107,12 +119,24 @@ export default function Products() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>SKU</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Category</strong></TableCell>
-                <TableCell align="right"><strong>Unit Cost</strong></TableCell>
-                <TableCell align="right"><strong>Reorder Point</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
+                <TableCell>
+                  <strong>SKU</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Name</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Category</strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>Unit Cost</strong>
+                </TableCell>
+                <TableCell align="right">
+                  <strong>Reorder Point</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Actions</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -121,7 +145,9 @@ export default function Products() {
                   <TableCell>{product.sku}</TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell>{product.category}</TableCell>
-                  <TableCell align="right">${product.unitCost.toFixed(2)}</TableCell>
+                  <TableCell align="right">
+                    ${product.unitCost.toFixed(2)}
+                  </TableCell>
                   <TableCell align="right">{product.reorderPoint}</TableCell>
                   <TableCell>
                     <IconButton
@@ -157,7 +183,8 @@ export default function Products() {
           <DialogTitle>Delete Product</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Are you sure you want to delete this product? This action cannot be undone.
+              Are you sure you want to delete this product? This action cannot
+              be undone.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -173,4 +200,3 @@ export default function Products() {
     </>
   );
 }
-

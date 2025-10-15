@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -11,47 +11,46 @@ import {
   AppBar,
   Toolbar,
   MenuItem,
-  CircularProgress,
-} from '@mui/material';
-import InventoryIcon from '@mui/icons-material/Inventory';
+} from "@mui/material";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { Product, Warehouse } from "../../types";
 
-export default function EditStock() {
-  const [stock, setStock] = useState({
-    productId: '',
-    warehouseId: '',
-    quantity: '',
+interface StockFormData {
+  productId: string;
+  warehouseId: string;
+  quantity: string;
+}
+
+export default function AddStock() {
+  const [stock, setStock] = useState<StockFormData>({
+    productId: "",
+    warehouseId: "",
+    quantity: "",
   });
-  const [products, setProducts] = useState([]);
-  const [warehouses, setWarehouses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
   const router = useRouter();
-  const { id } = router.query;
 
   useEffect(() => {
-    if (id) {
-      Promise.all([
-        fetch(`/api/stock/${id}`).then(res => res.json()),
-        fetch('/api/products').then(res => res.json()),
-        fetch('/api/warehouses').then(res => res.json()),
-      ]).then(([stockData, productsData, warehousesData]) => {
-        setStock(stockData);
-        setProducts(productsData);
-        setWarehouses(warehousesData);
-        setLoading(false);
-      });
-    }
-  }, [id]);
+    Promise.all([
+      fetch("/api/products").then((res) => res.json()),
+      fetch("/api/warehouses").then((res) => res.json()),
+    ]).then(([productsData, warehousesData]) => {
+      setProducts(productsData);
+      setWarehouses(warehousesData);
+    });
+  }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStock({ ...stock, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(`/api/stock/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         productId: parseInt(stock.productId),
         warehouseId: parseInt(stock.warehouseId),
@@ -59,17 +58,9 @@ export default function EditStock() {
       }),
     });
     if (res.ok) {
-      router.push('/stock');
+      router.push("/stock");
     }
   };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <>
@@ -97,9 +88,14 @@ export default function EditStock() {
       <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Edit Stock Record
+            Add Stock Record
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 2 }}
+          >
             <TextField
               margin="normal"
               required
@@ -139,18 +135,18 @@ export default function EditStock() {
               label="Quantity"
               name="quantity"
               type="number"
-              inputProps={{ min: '0' }}
+              inputProps={{ min: "0" }}
               value={stock.quantity}
               onChange={handleChange}
             />
-            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+            <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
               >
-                Update Stock
+                Add Stock
               </Button>
               <Button
                 fullWidth
@@ -167,4 +163,3 @@ export default function EditStock() {
     </>
   );
 }
-

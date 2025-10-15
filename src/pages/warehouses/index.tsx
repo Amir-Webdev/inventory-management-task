@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Container,
   Typography,
@@ -20,27 +20,30 @@ import {
   AppBar,
   Toolbar,
   Box,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { Warehouse } from "../../types";
 
 export default function Warehouses() {
-  const [warehouses, setWarehouses] = useState([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [open, setOpen] = useState(false);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     fetchWarehouses();
   }, []);
 
   const fetchWarehouses = () => {
-    fetch('/api/warehouses')
+    fetch("/api/warehouses")
       .then((res) => res.json())
-      .then((data) => setWarehouses(data));
+      .then((data: Warehouse[]) => setWarehouses(data));
   };
 
-  const handleClickOpen = (id) => {
+  const handleClickOpen = (id: number) => {
     setSelectedWarehouseId(id);
     setOpen(true);
   };
@@ -53,15 +56,17 @@ export default function Warehouses() {
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/warehouses/${selectedWarehouseId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (res.ok) {
-        setWarehouses(warehouses.filter((warehouse) => warehouse.id !== selectedWarehouseId));
+        setWarehouses(
+          warehouses.filter((warehouse) => warehouse.id !== selectedWarehouseId)
+        );
         handleClose();
       }
     } catch (error) {
-      console.error('Error deleting warehouse:', error);
+      console.error("Error deleting warehouse:", error);
     }
   };
 
@@ -89,14 +94,21 @@ export default function Warehouses() {
       </AppBar>
 
       <Container sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Typography variant="h4" component="h1">
             Warehouses
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            component={Link} 
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
             href="/warehouses/add"
           >
             Add Warehouse
@@ -107,10 +119,18 @@ export default function Warehouses() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>Code</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Location</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
+                <TableCell>
+                  <strong>Code</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Name</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Location</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Actions</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -153,7 +173,8 @@ export default function Warehouses() {
           <DialogTitle>Delete Warehouse</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Are you sure you want to delete this warehouse? This action cannot be undone.
+              Are you sure you want to delete this warehouse? This action cannot
+              be undone.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -169,4 +190,3 @@ export default function Warehouses() {
     </>
   );
 }
-
