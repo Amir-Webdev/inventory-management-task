@@ -24,6 +24,14 @@ export const stockSchema = z.object({
   quantity: z.int().nonnegative(),
 });
 
+export const transferSchema = z.object({
+  id: z.int().positive(),
+  productId: z.int().positive(),
+  quantity: z.int().nonnegative(),
+  sendingWarehouseId: z.int().positive(),
+  receivingWarehouseId: z.int().positive(),
+});
+
 export const inventoryOverviewSchema = productSchema.extend({
   totalQuantity: z.int().nonnegative(),
   isLowStock: z.boolean(),
@@ -57,9 +65,11 @@ export type StockFormInput = z.infer<typeof stockFormSchema>;
 export type Product = z.infer<typeof productSchema>;
 export type Warehouse = z.infer<typeof warehouseSchema>;
 export type Stock = z.infer<typeof stockSchema>;
+export type Transfer = z.infer<typeof transferSchema>;
 export type InventoryOverview = z.infer<typeof inventoryOverviewSchema>;
 
 // Response Schemas
 export const productsSchema = z.array(productSchema);
 export const warehousesSchema = z.array(warehouseSchema);
 export const stocksSchema = z.array(stockSchema);
+export const transfersSchema = z.array(transferSchema);
