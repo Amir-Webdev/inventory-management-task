@@ -2,13 +2,12 @@
 import fs from "fs";
 import path from "path";
 import { NextApiRequest, NextApiResponse } from "next";
-import { productSchema, productsSchema } from "../../../types";
-import { z } from "zod";
+import { Product, productSchema, productsSchema } from "../../../types";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const filePath = path.join(process.cwd(), "data", "products.json");
   const jsonData = fs.readFileSync(filePath);
-  let products: any[] = JSON.parse(jsonData.toString());
+  let products: Product[] = JSON.parse(jsonData.toString());
 
   if (req.method === "GET") {
     // Validate outgoing response
@@ -20,13 +19,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const inputParsed = productSchema.omit({ id: true }).safeParse(req.body);
     if (!inputParsed.success)
       return res.status(400).json({ message: "Invalid body" });
-    type ProductInput = Omit<z.infer<typeof productSchema>, "id"> & {
-      id?: number;
+    const newProduct = {
+      ...inputParsed.data,
+      id: products.length ? Math.max(...products.map((p) => p.id)) + 1 : 1,
     };
-    const newProduct = inputParsed.data as ProductInput;
-    newProduct.id = products.length
-      ? Math.max(...products.map((p) => p.id)) + 1
-      : 1;
     products.push(newProduct);
     fs.writeFileSync(filePath, JSON.stringify(products, null, 2));
     const outParsed = productSchema.safeParse(newProduct);
