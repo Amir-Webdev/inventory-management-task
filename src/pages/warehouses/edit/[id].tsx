@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -13,57 +13,35 @@ import {
   CircularProgress,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Warehouse } from "../../../types";
-
-interface WarehouseFormData {
-  name: string;
-  location: string;
-  code: string;
-}
+import { warehouseFormSchema, type WarehouseFormInput } from "../../../types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useWarehouse, useUpdateWarehouse } from "../../../hooks/useWarehouses";
 
 export default function EditWarehouse() {
-  const [warehouse, setWarehouse] = useState<WarehouseFormData>({
-    name: "",
-    location: "",
-    code: "",
-  });
-  const [loading, setLoading] = useState(true);
-
   const router = useRouter();
   const { id } = router.query;
+  const warehouseId = id ? Number(id) : undefined;
+  const { data, isPending } = useWarehouse(warehouseId);
+  const { mutateAsync: updateWarehouse, isPending: isSaving } =
+    useUpdateWarehouse(warehouseId as number);
+  const form = useForm<WarehouseFormInput, any, WarehouseFormInput>({
+    resolver: zodResolver(warehouseFormSchema) as any,
+    defaultValues: { code: "", name: "", location: "" },
+  });
 
   useEffect(() => {
-    if (id) {
-      fetch(`/api/warehouses/${id}`)
-        .then((res) => res.json())
-        .then((data: Warehouse) => {
-          setWarehouse({
-            name: data.name,
-            location: data.location,
-            code: data.code,
-          });
-          setLoading(false);
-        });
+    if (data) {
+      form.reset({ code: data.code, name: data.name, location: data.location });
     }
-  }, [id]);
+  }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWarehouse({ ...warehouse, [e.target.name]: e.target.value });
-  };
+  async function onSubmit(values: WarehouseFormInput) {
+    await updateWarehouse(values);
+    router.push("/warehouses");
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(`/api/warehouses/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(warehouse),
-    });
-    if (res.ok) {
-      router.push("/warehouses");
-    }
-  };
-
-  if (loading) {
+  if (isPending) {
     return (
       <Box
         sx={{
@@ -108,7 +86,7 @@ export default function EditWarehouse() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 2 }}
           >
@@ -118,8 +96,8 @@ export default function EditWarehouse() {
               fullWidth
               label="Warehouse Code"
               name="code"
-              value={warehouse.code}
-              onChange={handleChange}
+              value={form.watch("code")}
+              onChange={(e) => form.setValue("code", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -127,8 +105,8 @@ export default function EditWarehouse() {
               fullWidth
               label="Warehouse Name"
               name="name"
-              value={warehouse.name}
-              onChange={handleChange}
+              value={form.watch("name")}
+              onChange={(e) => form.setValue("name", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -136,8 +114,8 @@ export default function EditWarehouse() {
               fullWidth
               label="Location"
               name="location"
-              value={warehouse.location}
-              onChange={handleChange}
+              value={form.watch("location")}
+              onChange={(e) => form.setValue("location", e.target.value)}
             />
             <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
@@ -145,8 +123,9 @@ export default function EditWarehouse() {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={isSaving}
               >
-                Update Warehouse
+                {isSaving ? "Saving..." : "Update Warehouse"}
               </Button>
               <Button
                 fullWidth

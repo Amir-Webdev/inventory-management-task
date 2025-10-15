@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -12,45 +11,29 @@ import {
   Toolbar,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-
-interface ProductFormData {
-  sku: string;
-  name: string;
-  category: string;
-  unitCost: string;
-  reorderPoint: string;
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { productFormSchema, type ProductFormInput } from "../../types";
+import { useCreateProduct } from "../../hooks/useProducts";
 
 export default function AddProduct() {
-  const [product, setProduct] = useState<ProductFormData>({
-    sku: "",
-    name: "",
-    category: "",
-    unitCost: "",
-    reorderPoint: "",
+  const router = useRouter();
+  const { mutateAsync: createProduct, isPending } = useCreateProduct();
+  const form = useForm<ProductFormInput, any, ProductFormInput>({
+    resolver: zodResolver(productFormSchema) as any,
+    defaultValues: {
+      sku: "",
+      name: "",
+      category: "",
+      unitCost: 0,
+      reorderPoint: 0,
+    },
   });
 
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...product,
-        unitCost: parseFloat(product.unitCost),
-        reorderPoint: parseInt(product.reorderPoint),
-      }),
-    });
-    if (res.ok) {
-      router.push("/products");
-    }
-  };
+  async function onSubmit(values: ProductFormInput) {
+    await createProduct(values);
+    router.push("/products");
+  }
 
   return (
     <>
@@ -82,7 +65,7 @@ export default function AddProduct() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 2 }}
           >
@@ -92,8 +75,8 @@ export default function AddProduct() {
               fullWidth
               label="SKU"
               name="sku"
-              value={product.sku}
-              onChange={handleChange}
+              value={form.watch("sku")}
+              onChange={(e) => form.setValue("sku", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -101,8 +84,8 @@ export default function AddProduct() {
               fullWidth
               label="Product Name"
               name="name"
-              value={product.name}
-              onChange={handleChange}
+              value={form.watch("name")}
+              onChange={(e) => form.setValue("name", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -110,8 +93,8 @@ export default function AddProduct() {
               fullWidth
               label="Category"
               name="category"
-              value={product.category}
-              onChange={handleChange}
+              value={form.watch("category")}
+              onChange={(e) => form.setValue("category", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -121,8 +104,10 @@ export default function AddProduct() {
               name="unitCost"
               type="number"
               inputProps={{ step: "0.01", min: "0" }}
-              value={product.unitCost}
-              onChange={handleChange}
+              value={form.watch("unitCost")}
+              onChange={(e) =>
+                form.setValue("unitCost", Number(e.target.value))
+              }
             />
             <TextField
               margin="normal"
@@ -132,8 +117,10 @@ export default function AddProduct() {
               name="reorderPoint"
               type="number"
               inputProps={{ min: "0" }}
-              value={product.reorderPoint}
-              onChange={handleChange}
+              value={form.watch("reorderPoint")}
+              onChange={(e) =>
+                form.setValue("reorderPoint", Number(e.target.value))
+              }
             />
             <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
@@ -141,8 +128,9 @@ export default function AddProduct() {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={isPending}
               >
-                Add Product
+                {isPending ? "Saving..." : "Add Product"}
               </Button>
               <Button
                 fullWidth

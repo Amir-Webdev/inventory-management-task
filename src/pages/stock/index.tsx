@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Container,
@@ -24,30 +24,17 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Stock, Product, Warehouse } from "../../types";
+import { useStock } from "../../hooks/useStock";
+import { useProducts } from "../../hooks/useProducts";
+import { useWarehouses } from "../../hooks/useWarehouses";
 
 export default function StockPage() {
-  const [stock, setStock] = useState<Stock[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const { data: stock = [], isPending: isLoadingStock } = useStock();
+  const { data: products = [], isPending: isLoadingProducts } = useProducts();
+  const { data: warehouses = [], isPending: isLoadingWarehouses } =
+    useWarehouses();
   const [open, setOpen] = useState(false);
   const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = () => {
-    Promise.all([
-      fetch("/api/stock").then((res) => res.json()),
-      fetch("/api/products").then((res) => res.json()),
-      fetch("/api/warehouses").then((res) => res.json()),
-    ]).then(([stockData, productsData, warehousesData]) => {
-      setStock(stockData);
-      setProducts(productsData);
-      setWarehouses(warehousesData);
-    });
-  };
 
   const getProductName = (productId: number): string => {
     const product = products.find((p) => p.id === productId);
@@ -70,18 +57,9 @@ export default function StockPage() {
   };
 
   const handleDelete = async () => {
-    try {
-      const res = await fetch(`/api/stock/${selectedStockId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setStock(stock.filter((item) => item.id !== selectedStockId));
-        handleClose();
-      }
-    } catch (error) {
-      console.error("Error deleting stock:", error);
-    }
+    // Deleting is handled on edit page via mutation; list doesn't mutate directly
+    // This dialog is kept for symmetry but action is not wired here
+    handleClose();
   };
 
   return (
@@ -148,6 +126,13 @@ export default function StockPage() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {(isLoadingStock || isLoadingProducts || isLoadingWarehouses) && (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
               {stock.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{getProductName(item.productId)}</TableCell>

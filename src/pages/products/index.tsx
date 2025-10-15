@@ -25,23 +25,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { Product } from "../../types";
+import { useProducts, useDeleteProduct } from "../../hooks/useProducts";
 
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { data: products = [], isPending } = useProducts();
+  const { mutateAsync: deleteProduct, isPending: isDeleting } =
+    useDeleteProduct();
   const [open, setOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null
   );
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = () => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data: Product[]) => setProducts(data));
-  };
 
   const handleClickOpen = (id: number) => {
     setSelectedProductId(id);
@@ -55,16 +48,8 @@ export default function Products() {
 
   const handleDelete = async () => {
     try {
-      const res = await fetch(`/api/products/${selectedProductId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setProducts(
-          products.filter((product) => product.id !== selectedProductId)
-        );
-        handleClose();
-      }
+      await deleteProduct(selectedProductId!);
+      handleClose();
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -140,6 +125,13 @@ export default function Products() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {(isPending || isDeleting) && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
               {products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.sku}</TableCell>

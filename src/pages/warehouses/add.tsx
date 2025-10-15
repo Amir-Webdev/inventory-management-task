@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -12,37 +11,27 @@ import {
   Toolbar,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-
-interface WarehouseFormData {
-  name: string;
-  location: string;
-  code: string;
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { warehouseFormSchema, type WarehouseFormInput } from "../../types";
+import { useCreateWarehouse } from "../../hooks/useWarehouses";
 
 export default function AddWarehouse() {
-  const [warehouse, setWarehouse] = useState<WarehouseFormData>({
-    name: "",
-    location: "",
-    code: "",
+  const router = useRouter();
+  const { mutateAsync: createWarehouse, isPending } = useCreateWarehouse();
+  const form = useForm<WarehouseFormInput, any, WarehouseFormInput>({
+    resolver: zodResolver(warehouseFormSchema) as any,
+    defaultValues: {
+      code: "",
+      name: "",
+      location: "",
+    },
   });
 
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWarehouse({ ...warehouse, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/warehouses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(warehouse),
-    });
-    if (res.ok) {
-      router.push("/warehouses");
-    }
-  };
+  async function onSubmit(values: WarehouseFormInput) {
+    await createWarehouse(values);
+    router.push("/warehouses");
+  }
 
   return (
     <>
@@ -74,7 +63,7 @@ export default function AddWarehouse() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 2 }}
           >
@@ -84,8 +73,8 @@ export default function AddWarehouse() {
               fullWidth
               label="Warehouse Code"
               name="code"
-              value={warehouse.code}
-              onChange={handleChange}
+              value={form.watch("code")}
+              onChange={(e) => form.setValue("code", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -93,8 +82,8 @@ export default function AddWarehouse() {
               fullWidth
               label="Warehouse Name"
               name="name"
-              value={warehouse.name}
-              onChange={handleChange}
+              value={form.watch("name")}
+              onChange={(e) => form.setValue("name", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -102,8 +91,8 @@ export default function AddWarehouse() {
               fullWidth
               label="Location"
               name="location"
-              value={warehouse.location}
-              onChange={handleChange}
+              value={form.watch("location")}
+              onChange={(e) => form.setValue("location", e.target.value)}
             />
             <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
@@ -111,8 +100,9 @@ export default function AddWarehouse() {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={isPending}
               >
-                Add Warehouse
+                {isPending ? "Saving..." : "Add Warehouse"}
               </Button>
               <Button
                 fullWidth

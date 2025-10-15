@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -13,67 +13,48 @@ import {
   CircularProgress,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Product } from "../../../types";
-
-interface ProductFormData {
-  sku: string;
-  name: string;
-  category: string;
-  unitCost: string;
-  reorderPoint: string;
-}
+import { productFormSchema, type ProductFormInput } from "../../../types";
+import { useProduct, useUpdateProduct } from "../../../hooks/useProducts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 export default function EditProduct() {
-  const [product, setProduct] = useState<ProductFormData>({
-    sku: "",
-    name: "",
-    category: "",
-    unitCost: "",
-    reorderPoint: "",
-  });
-  const [loading, setLoading] = useState(true);
-
   const router = useRouter();
   const { id } = router.query;
+  const productId = id ? Number(id) : undefined;
+  const { data, isPending } = useProduct(productId);
+  const { mutateAsync: updateProduct, isPending: isSaving } = useUpdateProduct(
+    productId as number
+  );
+  const form = useForm<ProductFormInput, any, ProductFormInput>({
+    resolver: zodResolver(productFormSchema) as any,
+    defaultValues: {
+      sku: "",
+      name: "",
+      category: "",
+      unitCost: 0,
+      reorderPoint: 0,
+    },
+  });
 
   useEffect(() => {
-    if (id) {
-      fetch(`/api/products/${id}`)
-        .then((res) => res.json())
-        .then((data: Product) => {
-          setProduct({
-            sku: data.sku,
-            name: data.name,
-            category: data.category,
-            unitCost: data.unitCost.toString(),
-            reorderPoint: data.reorderPoint.toString(),
-          });
-          setLoading(false);
-        });
+    if (data) {
+      form.reset({
+        sku: data.sku,
+        name: data.name,
+        category: data.category,
+        unitCost: data.unitCost,
+        reorderPoint: data.reorderPoint,
+      });
     }
-  }, [id]);
+  }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
-  };
+  async function onSubmit(values: ProductFormInput) {
+    await updateProduct(values);
+    router.push("/products");
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...product,
-        unitCost: parseFloat(product.unitCost),
-        reorderPoint: parseInt(product.reorderPoint),
-      }),
-    });
-    if (res.ok) {
-      router.push("/products");
-    }
-  };
-
-  if (loading) {
+  if (isPending) {
     return (
       <Box
         sx={{
@@ -118,7 +99,7 @@ export default function EditProduct() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 2 }}
           >
@@ -128,8 +109,8 @@ export default function EditProduct() {
               fullWidth
               label="SKU"
               name="sku"
-              value={product.sku}
-              onChange={handleChange}
+              value={form.watch("sku")}
+              onChange={(e) => form.setValue("sku", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -137,8 +118,8 @@ export default function EditProduct() {
               fullWidth
               label="Product Name"
               name="name"
-              value={product.name}
-              onChange={handleChange}
+              value={form.watch("name")}
+              onChange={(e) => form.setValue("name", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -146,8 +127,8 @@ export default function EditProduct() {
               fullWidth
               label="Category"
               name="category"
-              value={product.category}
-              onChange={handleChange}
+              value={form.watch("category")}
+              onChange={(e) => form.setValue("category", e.target.value)}
             />
             <TextField
               margin="normal"
@@ -157,8 +138,10 @@ export default function EditProduct() {
               name="unitCost"
               type="number"
               inputProps={{ step: "0.01", min: "0" }}
-              value={product.unitCost}
-              onChange={handleChange}
+              value={form.watch("unitCost")}
+              onChange={(e) =>
+                form.setValue("unitCost", Number(e.target.value))
+              }
             />
             <TextField
               margin="normal"
@@ -168,8 +151,10 @@ export default function EditProduct() {
               name="reorderPoint"
               type="number"
               inputProps={{ min: "0" }}
-              value={product.reorderPoint}
-              onChange={handleChange}
+              value={form.watch("reorderPoint")}
+              onChange={(e) =>
+                form.setValue("reorderPoint", Number(e.target.value))
+              }
             />
             <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
@@ -177,8 +162,9 @@ export default function EditProduct() {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={isSaving}
               >
-                Update Product
+                {isSaving ? "Saving..." : "Update Product"}
               </Button>
               <Button
                 fullWidth

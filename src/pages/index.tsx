@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Container,
@@ -21,25 +20,17 @@ import {
 import InventoryIcon from "@mui/icons-material/Inventory";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
 import CategoryIcon from "@mui/icons-material/Category";
-import { Product, Warehouse, Stock, InventoryOverview } from "../types";
+import { InventoryOverview } from "../types";
+import { useProducts } from "../hooks/useProducts";
+import { useWarehouses } from "../hooks/useWarehouses";
+import { useStock } from "../hooks/useStock";
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [stock, setStock] = useState<Stock[]>([]);
-
-  useEffect(() => {
-    // Fetch all data
-    Promise.all([
-      fetch("/api/products").then((res) => res.json()),
-      fetch("/api/warehouses").then((res) => res.json()),
-      fetch("/api/stock").then((res) => res.json()),
-    ]).then(([productsData, warehousesData, stockData]) => {
-      setProducts(productsData);
-      setWarehouses(warehousesData);
-      setStock(stockData);
-    });
-  }, []);
+  const { data: products = [], isPending: productsLoading } = useProducts();
+  const { data: warehouses = [], isPending: warehousesLoading } =
+    useWarehouses();
+  const { data: stock = [], isPending: stockLoading } = useStock();
+  const isLoading = productsLoading || warehousesLoading || stockLoading;
 
   // Calculate total inventory value
   const totalValue = stock.reduce((sum, item) => {
@@ -149,6 +140,13 @@ export default function Home() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
               {inventoryOverview.map((item) => (
                 <TableRow
                   key={item.id}

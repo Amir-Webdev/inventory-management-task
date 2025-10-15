@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -13,54 +13,32 @@ import {
   MenuItem,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Product, Warehouse } from "../../types";
-
-interface StockFormData {
-  productId: string;
-  warehouseId: string;
-  quantity: string;
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  stockFormSchema,
+  type StockFormInput,
+  type Product,
+  type Warehouse,
+} from "../../types";
+import { useProducts } from "../../hooks/useProducts";
+import { useWarehouses } from "../../hooks/useWarehouses";
+import { useCreateStock } from "../../hooks/useStock";
 
 export default function AddStock() {
-  const [stock, setStock] = useState<StockFormData>({
-    productId: "",
-    warehouseId: "",
-    quantity: "",
-  });
-  const [products, setProducts] = useState<Product[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-
   const router = useRouter();
+  const { data: products = [] } = useProducts();
+  const { data: warehouses = [] } = useWarehouses();
+  const { mutateAsync: createStock, isPending } = useCreateStock();
+  const form = useForm<StockFormInput, any, StockFormInput>({
+    resolver: zodResolver(stockFormSchema) as any,
+    defaultValues: { productId: 0, warehouseId: 0, quantity: 0 },
+  });
 
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/products").then((res) => res.json()),
-      fetch("/api/warehouses").then((res) => res.json()),
-    ]).then(([productsData, warehousesData]) => {
-      setProducts(productsData);
-      setWarehouses(warehousesData);
-    });
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStock({ ...stock, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/stock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: parseInt(stock.productId),
-        warehouseId: parseInt(stock.warehouseId),
-        quantity: parseInt(stock.quantity),
-      }),
-    });
-    if (res.ok) {
-      router.push("/stock");
-    }
-  };
+  async function onSubmit(values: StockFormInput) {
+    await createStock(values);
+    router.push("/stock");
+  }
 
   return (
     <>
@@ -92,7 +70,7 @@ export default function AddStock() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 2 }}
           >
@@ -103,8 +81,10 @@ export default function AddStock() {
               select
               label="Product"
               name="productId"
-              value={stock.productId}
-              onChange={handleChange}
+              value={form.watch("productId") || ""}
+              onChange={(e) =>
+                form.setValue("productId", Number(e.target.value))
+              }
             >
               {products.map((product) => (
                 <MenuItem key={product.id} value={product.id}>
@@ -119,8 +99,10 @@ export default function AddStock() {
               select
               label="Warehouse"
               name="warehouseId"
-              value={stock.warehouseId}
-              onChange={handleChange}
+              value={form.watch("warehouseId") || ""}
+              onChange={(e) =>
+                form.setValue("warehouseId", Number(e.target.value))
+              }
             >
               {warehouses.map((warehouse) => (
                 <MenuItem key={warehouse.id} value={warehouse.id}>
@@ -136,8 +118,10 @@ export default function AddStock() {
               name="quantity"
               type="number"
               inputProps={{ min: "0" }}
-              value={stock.quantity}
-              onChange={handleChange}
+              value={form.watch("quantity")}
+              onChange={(e) =>
+                form.setValue("quantity", Number(e.target.value))
+              }
             />
             <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
               <Button
@@ -145,8 +129,9 @@ export default function AddStock() {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={isPending}
               >
-                Add Stock
+                {isPending ? "Saving..." : "Add Stock"}
               </Button>
               <Button
                 fullWidth

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Container,
@@ -24,24 +24,16 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Warehouse } from "../../types";
+import { useWarehouses, useDeleteWarehouse } from "../../hooks/useWarehouses";
 
 export default function Warehouses() {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const { data: warehouses = [], isPending } = useWarehouses();
+  const { mutateAsync: deleteWarehouse, isPending: isDeleting } =
+    useDeleteWarehouse();
   const [open, setOpen] = useState(false);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<number | null>(
     null
   );
-
-  useEffect(() => {
-    fetchWarehouses();
-  }, []);
-
-  const fetchWarehouses = () => {
-    fetch("/api/warehouses")
-      .then((res) => res.json())
-      .then((data: Warehouse[]) => setWarehouses(data));
-  };
 
   const handleClickOpen = (id: number) => {
     setSelectedWarehouseId(id);
@@ -55,16 +47,8 @@ export default function Warehouses() {
 
   const handleDelete = async () => {
     try {
-      const res = await fetch(`/api/warehouses/${selectedWarehouseId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setWarehouses(
-          warehouses.filter((warehouse) => warehouse.id !== selectedWarehouseId)
-        );
-        handleClose();
-      }
+      await deleteWarehouse(selectedWarehouseId!);
+      handleClose();
     } catch (error) {
       console.error("Error deleting warehouse:", error);
     }
@@ -134,6 +118,13 @@ export default function Warehouses() {
               </TableRow>
             </TableHead>
             <TableBody>
+              {(isPending || isDeleting) && (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
               {warehouses.map((warehouse) => (
                 <TableRow key={warehouse.id}>
                   <TableCell>{warehouse.code}</TableCell>
