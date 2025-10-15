@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
 import fs from "fs";
-import { Transfer, transferSchema } from "../../../types";
+import { Transfer, transferSchema, transfersSchema } from "../../../types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +12,7 @@ export default async function handler(
   let transfers: Transfer[] = JSON.parse(jsonData.toString());
 
   if (req.method === "GET") {
-    const parsed = transferSchema.safeParse(transfers);
+    const parsed = transfersSchema.safeParse(transfers);
 
     if (!parsed.success)
       return res.status(500).json({ message: "Invalid data" });

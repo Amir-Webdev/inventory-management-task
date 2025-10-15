@@ -18,5 +18,3 @@ export function useCreateTransfer() {
   });
   return { mutate, mutateAsync, isPending, error };
 }
-
-export default useTransfers;
