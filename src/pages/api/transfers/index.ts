@@ -53,6 +53,18 @@ export default async function handler(
           "Required Transfer Quantity is more than what the sending warehouse holds",
       });
 
+    const sendingWarehouseStockIndex = stocks.findIndex(
+      (s) => s.id === sendingWarehouseStock.id
+    );
+    stocks[sendingWarehouseStockIndex] = {
+      ...stocks[sendingWarehouseStockIndex],
+      quantity:
+        stocks[sendingWarehouseStockIndex].quantity - inputParsed.data.quantity,
+    };
+    if (stocks[sendingWarehouseStockIndex].quantity === 0) {
+      stocks.splice(sendingWarehouseStockIndex, 1);
+    }
+
     const receivingWarehouseStocks = stocks.filter(
       (stock) => stock.warehouseId === receivingWarehouseId
     );
@@ -77,7 +89,6 @@ export default async function handler(
       };
       stocks.push(newStock);
     } else {
-      // Update existing stock quantity
       const index = stocks.findIndex(
         (s) => s.id === receivingWarehouseStock.id
       );
@@ -85,18 +96,6 @@ export default async function handler(
         ...stocks[index],
         quantity: stocks[index].quantity + quantity,
       };
-    }
-
-    const sendingWarehouseStockIndex = stocks.findIndex(
-      (s) => s.id === sendingWarehouseStock.id
-    );
-    stocks[sendingWarehouseStockIndex] = {
-      ...stocks[sendingWarehouseStockIndex],
-      quantity:
-        stocks[sendingWarehouseStockIndex].quantity - inputParsed.data.quantity,
-    };
-    if (stocks[sendingWarehouseStockIndex].quantity === 0) {
-      stocks.splice(sendingWarehouseStockIndex, 1);
     }
 
     fs.writeFileSync(stocksFilePath, JSON.stringify(stocks, null, 2));

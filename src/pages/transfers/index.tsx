@@ -63,8 +63,9 @@ export default function Products() {
   }
 
   async function handleDelete() {
+    if (!selectedTransferId) return;
     try {
-      await deleteTransfer(selectedTransferId!);
+      await deleteTransfer(selectedTransferId);
       handleClose();
     } catch (error) {
       console.error("Error deleting product:", error);
