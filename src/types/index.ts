@@ -61,12 +61,17 @@ export const stockFormSchema = z.object({
 });
 export type StockFormInput = z.infer<typeof stockFormSchema>;
 
-export const transferFormSchema = z.object({
-  productId: z.coerce.number().int().positive(),
-  quantity: z.coerce.number().int().nonnegative(),
-  sendingWarehouseId: z.coerce.number().int().positive(),
-  receivingWarehouseId: z.coerce.number().int().positive(),
-});
+export const transferFormSchema = z
+  .object({
+    productId: z.coerce.number().int().positive("Must be > 0"),
+    quantity: z.coerce.number().int().nonnegative("Must be >= 0"),
+    sendingWarehouseId: z.coerce.number().int().positive("Must be > 0"),
+    receivingWarehouseId: z.coerce.number().int().positive("Must be > 0"),
+  })
+  .refine((data) => data.receivingWarehouseId !== data.sendingWarehouseId, {
+    message: "Sending and receiving warehouses cannot be the same",
+    path: ["receivingWarehouseId"],
+  });
 export type TransferFormInput = z.infer<typeof transferFormSchema>;
 
 // Types from domain schemas
