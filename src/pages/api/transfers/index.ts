@@ -16,8 +16,8 @@ export default async function handler(
   const transfersJsonData = fs.readFileSync(transfersFilePath);
   let transfers: Transfer[] = JSON.parse(transfersJsonData.toString());
 
-  const stockssFilePath = path.join(process.cwd(), "data", "stock.json");
-  const stocksJsonData = fs.readFileSync(stockssFilePath);
+  const stocksFilePath = path.join(process.cwd(), "data", "stock.json");
+  const stocksJsonData = fs.readFileSync(stocksFilePath);
   let stocks: Stock[] = JSON.parse(stocksJsonData.toString());
 
   if (req.method === "GET") {
@@ -33,27 +33,73 @@ export default async function handler(
     if (!inputParsed.success)
       return res.status(400).json({ message: "Invalid body" });
 
+    const { productId, quantity, receivingWarehouseId, sendingWarehouseId } =
+      inputParsed.data;
+
     const sendingWarehouseStock = stocks.find(
       (stock) =>
-        stock.productId === inputParsed.data.productId &&
-        stock.warehouseId === inputParsed.data.sendingWarehouseId
+        stock.productId === productId &&
+        stock.warehouseId === sendingWarehouseId
     );
 
     if (!sendingWarehouseStock)
-      return res
-        .status(404)
-        .json({
-          message:
-            "Could not found a warehouse with the specified product in it",
-        });
+      return res.status(404).json({
+        message: "Could not find a warehouse with the specified product in it",
+      });
 
-    if (inputParsed.data.quantity > sendingWarehouseStock.quantity)
-      return res
-        .status(400)
-        .json({
-          message:
-            "Required Transfer Quantity is more than what the sending warehouse holds",
-        });
+    if (quantity > sendingWarehouseStock.quantity)
+      return res.status(400).json({
+        message:
+          "Required Transfer Quantity is more than what the sending warehouse holds",
+      });
+
+    const receivingWarehouseStocks = stocks.filter(
+      (stock) => stock.warehouseId === receivingWarehouseId
+    );
+
+    if (!receivingWarehouseStocks)
+      return res.status(404).json({
+        message: "Could not find the receiving warehouse",
+      });
+
+    const receivingWarehouseStock = receivingWarehouseStocks.find(
+      (stock) =>
+        stock.productId === productId &&
+        stock.warehouseId === receivingWarehouseId
+    );
+
+    if (!receivingWarehouseStock) {
+      const newStock: Stock = {
+        productId,
+        quantity,
+        warehouseId: receivingWarehouseId,
+        id: stocks.length ? Math.max(...stocks.map((s) => s.id)) + 1 : 1,
+      };
+      stocks.push(newStock);
+    } else {
+      // Update existing stock quantity
+      const index = stocks.findIndex(
+        (s) => s.id === receivingWarehouseStock.id
+      );
+      stocks[index] = {
+        ...stocks[index],
+        quantity: stocks[index].quantity + quantity,
+      };
+    }
+
+    const sendingWarehouseStockIndex = stocks.findIndex(
+      (s) => s.id === sendingWarehouseStock.id
+    );
+    stocks[sendingWarehouseStockIndex] = {
+      ...stocks[sendingWarehouseStockIndex],
+      quantity:
+        stocks[sendingWarehouseStockIndex].quantity - inputParsed.data.quantity,
+    };
+    if (stocks[sendingWarehouseStockIndex].quantity === 0) {
+      stocks.splice(sendingWarehouseStockIndex, 1);
+    }
+
+    fs.writeFileSync(stocksFilePath, JSON.stringify(stocks, null, 2));
 
     const newTransfer = {
       ...inputParsed.data,
