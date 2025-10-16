@@ -17,3 +17,7 @@ export async function createTransfer(
   const { data } = await api.post("/api/transfers", payload);
   return parseOrThrow(transferSchema, data);
 }
+
+export async function deleteTransfer(id: number): Promise<void> {
+  await api.delete(`/api/transfers/${id}`);
+}
