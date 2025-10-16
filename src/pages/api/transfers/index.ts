@@ -1,15 +1,24 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
 import fs from "fs";
-import { Transfer, transferSchema, transfersSchema } from "../../../types";
+import {
+  Stock,
+  Transfer,
+  transferSchema,
+  transfersSchema,
+} from "../../../types";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const filePath = path.join(process.cwd(), "data", "transfers.json");
-  const jsonData = fs.readFileSync(filePath);
-  let transfers: Transfer[] = JSON.parse(jsonData.toString());
+  const transfersFilePath = path.join(process.cwd(), "data", "transfers.json");
+  const transfersJsonData = fs.readFileSync(transfersFilePath);
+  let transfers: Transfer[] = JSON.parse(transfersJsonData.toString());
+
+  const stockssFilePath = path.join(process.cwd(), "data", "stock.json");
+  const stocksJsonData = fs.readFileSync(stockssFilePath);
+  let stocks: Stock[] = JSON.parse(stocksJsonData.toString());
 
   if (req.method === "GET") {
     const parsed = transfersSchema.safeParse(transfers);
@@ -24,6 +33,28 @@ export default async function handler(
     if (!inputParsed.success)
       return res.status(400).json({ message: "Invalid body" });
 
+    const sendingWarehouseStock = stocks.find(
+      (stock) =>
+        stock.productId === inputParsed.data.productId &&
+        stock.warehouseId === inputParsed.data.sendingWarehouseId
+    );
+
+    if (!sendingWarehouseStock)
+      return res
+        .status(404)
+        .json({
+          message:
+            "Could not found a warehouse with the specified product in it",
+        });
+
+    if (inputParsed.data.quantity > sendingWarehouseStock.quantity)
+      return res
+        .status(400)
+        .json({
+          message:
+            "Required Transfer Quantity is more than what the sending warehouse holds",
+        });
+
     const newTransfer = {
       ...inputParsed.data,
       id: transfers.length ? Math.max(...transfers.map((p) => p.id)) + 1 : 1,
@@ -31,7 +62,7 @@ export default async function handler(
 
     transfers.push(newTransfer);
 
-    fs.writeFileSync(filePath, JSON.stringify(transfers, null, 2));
+    fs.writeFileSync(transfersFilePath, JSON.stringify(transfers, null, 2));
 
     const outParsed = transferSchema.safeParse(newTransfer);
 
