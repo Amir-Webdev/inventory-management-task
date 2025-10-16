@@ -86,3 +86,18 @@ export const productsSchema = z.array(productSchema);
 export const warehousesSchema = z.array(warehouseSchema);
 export const stocksSchema = z.array(stockSchema);
 export const transfersSchema = z.array(transferSchema);
+
+// Alerts
+export const alertSchema = z.object({
+  id: z.int().positive(),
+  productId: z.int().positive(),
+  totalQuantity: z.int().nonnegative(),
+  reorderPoint: z.int().nonnegative(),
+  status: z.enum(["new", "acknowledged", "ordered", "resolved"]),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  classification: z.enum(["critical", "low", "adequate", "overstock"]),
+  note: z.string().optional(),
+});
+export type Alert = z.infer<typeof alertSchema>;
+export const alertsSchema = z.array(alertSchema);
