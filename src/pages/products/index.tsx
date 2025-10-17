@@ -20,6 +20,12 @@ import {
   AppBar,
   Toolbar,
   Box,
+  Grid,
+  Card,
+  CardContent,
+  Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -28,6 +34,8 @@ import { Product } from "../../types";
 import { useProducts, useDeleteProduct } from "../../hooks/useProducts";
 
 export default function Products() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { data: products = [], isPending } = useProducts();
   const { mutateAsync: deleteProduct, isPending: isDeleting } =
     useDeleteProduct();
@@ -56,16 +64,26 @@ export default function Products() {
   };
 
   return (
-    <Container sx={{ mt: 4, mb: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           mb: 3,
+          flexDirection: { xs: "column", sm: "row" },
+          gap: { xs: 2, sm: 0 },
         }}
       >
-        <Typography variant="h4" component="h1">
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            fontSize: { xs: "1.75rem", sm: "2rem", md: "2.5rem" },
+            textAlign: { xs: "center", sm: "left" },
+          }}
+        >
           Products
         </Typography>
         <Button
@@ -73,53 +91,59 @@ export default function Products() {
           color="primary"
           component={Link}
           href="/products/add"
+          sx={{
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: "140px" },
+          }}
         >
           Add Product
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <strong>SKU</strong>
-              </TableCell>
-              <TableCell>
-                <strong>Name</strong>
-              </TableCell>
-              <TableCell>
-                <strong>Category</strong>
-              </TableCell>
-              <TableCell align="right">
-                <strong>Unit Cost</strong>
-              </TableCell>
-              <TableCell align="right">
-                <strong>Reorder Point</strong>
-              </TableCell>
-              <TableCell>
-                <strong>Actions</strong>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(isPending || isDeleting) && (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            )}
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>{product.sku}</TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell align="right">
-                  ${product.unitCost.toFixed(2)}
-                </TableCell>
-                <TableCell align="right">{product.reorderPoint}</TableCell>
-                <TableCell>
+      {/* Mobile Card Layout */}
+      {isMobile ? (
+        <Box>
+          {(isPending || isDeleting) && (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <Typography color="text.secondary">Loading...</Typography>
+            </Box>
+          )}
+
+          {products.map((product) => (
+            <Card key={product.id} sx={{ mb: 2 }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h6" fontWeight={600}>
+                    {product.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    SKU: {product.sku}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                  <Chip
+                    label={product.category}
+                    size="small"
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={`$${product.unitCost.toFixed(2)}`}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={`Reorder: ${product.reorderPoint}`}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                  />
+                </Box>
+
+                <Box
+                  sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}
+                >
                   <IconButton
                     color="primary"
                     component={Link}
@@ -135,19 +159,99 @@ export default function Products() {
                   >
                     <DeleteIcon />
                   </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-            {products.length === 0 && (
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+
+          {products.length === 0 && !isPending && !isDeleting && (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <Typography color="text.secondary">
+                No products available.
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      ) : (
+        /* Desktop Table Layout */
+        <TableContainer
+          component={Paper}
+          sx={{
+            overflowX: "auto",
+            "&::-webkit-scrollbar": {
+              height: 8,
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#f1f5f9",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#cbd5e1",
+              borderRadius: 4,
+            },
+          }}
+        >
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={6} align="center">
-                  No products available.
+                <TableCell sx={{ fontWeight: 600 }}>SKU</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 600 }}>
+                  Unit Cost
                 </TableCell>
+                <TableCell align="right" sx={{ fontWeight: 600 }}>
+                  Reorder Point
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {(isPending || isDeleting) && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
+              {products.map((product) => (
+                <TableRow key={product.id} hover>
+                  <TableCell>{product.sku}</TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell align="right">
+                    ${product.unitCost.toFixed(2)}
+                  </TableCell>
+                  <TableCell align="right">{product.reorderPoint}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="primary"
+                      component={Link}
+                      href={`/products/edit/${product.id}`}
+                      size="small"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleClickOpen(product.id)}
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {products.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    No products available.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Delete Product</DialogTitle>
@@ -166,6 +270,6 @@ export default function Products() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 }

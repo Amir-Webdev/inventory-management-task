@@ -17,6 +17,9 @@ import {
   Avatar,
   IconButton,
   Tooltip,
+  useMediaQuery,
+  useTheme,
+  Divider,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
@@ -33,6 +36,8 @@ import { useStock } from "../hooks/useStock";
 import { useAlerts } from "../hooks/useAlerts";
 
 export default function Home() {
+  const theme = useTheme();
+  const isNarrow = useMediaQuery("(max-width:700px)");
   const { data: products = [], isPending: productsLoading } = useProducts();
   const { data: warehouses = [], isPending: warehousesLoading } =
     useWarehouses();
@@ -392,138 +397,186 @@ export default function Home() {
           </Button>
         </Box>
 
-        <Card>
-          <TableContainer
-            sx={{
-              overflowX: "auto",
-              "&::-webkit-scrollbar": {
-                height: 8,
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: "#f1f5f9",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#cbd5e1",
-                borderRadius: 4,
-              },
-            }}
-          >
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600 }}>
-                    Product Details
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 600 }}>
-                    Stock Level
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 600 }}>
-                    Reorder Point
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Status
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoading && (
+        {isNarrow ? (
+          <Box>
+            {isLoading && (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 3, gap: 2 }}>
+                <LinearProgress sx={{ width: 100 }} />
+                <Typography color="text.secondary">Loading inventory data...</Typography>
+              </Box>
+            )}
+            {inventoryOverview.slice(0, 10).map((item) => (
+              <Card key={item.id} sx={{ mb: 2 }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={700}>{item.sku}</Typography>
+                      <Typography variant="body2" color="text.secondary">{item.name}</Typography>
+                    </Box>
+                    <Chip label={item.category} size="small" variant="outlined" sx={{ borderRadius: 2 }} />
+                  </Box>
+                  <Divider sx={{ my: 1 }} />
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">Stock</Typography>
+                    <Typography variant="subtitle2" fontWeight={700}>{item.totalQuantity.toLocaleString()}</Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">Reorder Point</Typography>
+                    <Typography variant="body2">{item.reorderPoint}</Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Chip
+                      icon={item.isLowStock ? <WarningIcon /> : <CheckCircleIcon />}
+                      label={item.isLowStock ? "Low Stock" : "In Stock"}
+                      color={item.isLowStock ? "warning" : "success"}
+                      variant={item.isLowStock ? "filled" : "outlined"}
+                      size="small"
+                      sx={{ borderRadius: 2 }}
+                    />
+                    <Tooltip title="View Details">
+                      <IconButton size="small" component={Link} href={`/products/edit/${item.id}`}>
+                        <VisibilityIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        ) : (
+          <Card>
+            <TableContainer
+              sx={{
+                overflowX: "auto",
+                "&::-webkit-scrollbar": {
+                  height: 8,
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "#f1f5f9",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#cbd5e1",
+                  borderRadius: 4,
+                },
+              }}
+            >
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 2,
-                        }}
-                      >
-                        <LinearProgress sx={{ width: 100 }} />
-                        <Typography color="text.secondary">
-                          Loading inventory data...
-                        </Typography>
-                      </Box>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      Product Details
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600 }}>
+                      Stock Level
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600 }}>
+                      Reorder Point
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Status
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Actions
                     </TableCell>
                   </TableRow>
-                )}
-                {inventoryOverview.slice(0, 10).map((item) => (
-                  <TableRow
-                    key={item.id}
-                    hover
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: "action.hover",
-                      },
-                    }}
-                  >
-                    <TableCell>
-                      <Box>
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight={600}
-                          color="text.primary"
+                </TableHead>
+                <TableBody>
+                  {isLoading && (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 2,
+                          }}
                         >
-                          {item.sku}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.name}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.category}
-                        size="small"
-                        variant="outlined"
-                        sx={{ borderRadius: 2 }}
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="subtitle2" fontWeight={600}>
-                        {item.totalQuantity.toLocaleString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body2" color="text.secondary">
-                        {item.reorderPoint}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Chip
-                        icon={
-                          item.isLowStock ? (
-                            <WarningIcon />
-                          ) : (
-                            <CheckCircleIcon />
-                          )
-                        }
-                        label={item.isLowStock ? "Low Stock" : "In Stock"}
-                        color={item.isLowStock ? "warning" : "success"}
-                        variant={item.isLowStock ? "filled" : "outlined"}
-                        size="small"
-                        sx={{ borderRadius: 2 }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Tooltip title="View Details">
-                        <IconButton
+                          <LinearProgress sx={{ width: 100 }} />
+                          <Typography color="text.secondary">
+                            Loading inventory data...
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {inventoryOverview.slice(0, 10).map((item) => (
+                    <TableRow
+                      key={item.id}
+                      hover
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                        },
+                      }}
+                    >
+                      <TableCell>
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={600}
+                            color="text.primary"
+                          >
+                            {item.sku}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {item.name}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={item.category}
                           size="small"
-                          component={Link}
-                          href={`/products/edit/${item.id}`}
-                        >
-                          <VisibilityIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
+                          variant="outlined"
+                          sx={{ borderRadius: 2 }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" fontWeight={600}>
+                          {item.totalQuantity.toLocaleString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="body2" color="text.secondary">
+                          {item.reorderPoint}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          icon={
+                            item.isLowStock ? (
+                              <WarningIcon />
+                            ) : (
+                              <CheckCircleIcon />
+                            )
+                          }
+                          label={item.isLowStock ? "Low Stock" : "In Stock"}
+                          color={item.isLowStock ? "warning" : "success"}
+                          variant={item.isLowStock ? "filled" : "outlined"}
+                          size="small"
+                          sx={{ borderRadius: 2 }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title="View Details">
+                          <IconButton
+                            size="small"
+                            component={Link}
+                            href={`/products/edit/${item.id}`}
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Card>
+        )}
 
         {inventoryOverview.length > 10 && (
           <Box sx={{ mt: 2, textAlign: "center" }}>
