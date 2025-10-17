@@ -24,13 +24,16 @@ import { InventoryOverview } from "../types";
 import { useProducts } from "../hooks/useProducts";
 import { useWarehouses } from "../hooks/useWarehouses";
 import { useStock } from "../hooks/useStock";
+import { useAlerts } from "../hooks/useAlerts";
 
 export default function Home() {
   const { data: products = [], isPending: productsLoading } = useProducts();
   const { data: warehouses = [], isPending: warehousesLoading } =
     useWarehouses();
   const { data: stock = [], isPending: stockLoading } = useStock();
-  const isLoading = productsLoading || warehousesLoading || stockLoading;
+  const { data: alerts = [], isPending: alertsLoading } = useAlerts();
+  const isLoading =
+    productsLoading || warehousesLoading || stockLoading || alertsLoading;
 
   // Calculate total inventory value
   const totalValue = stock.reduce((sum, item) => {
@@ -65,6 +68,9 @@ export default function Home() {
           </Button>
           <Button color="inherit" component={Link} href="/stock">
             Stock Levels
+          </Button>
+          <Button color="inherit" component={Link} href="/alerts">
+            Alerts
           </Button>
         </Toolbar>
       </AppBar>
@@ -106,6 +112,24 @@ export default function Home() {
                   <Typography variant="h6">Total Inventory Value</Typography>
                 </Box>
                 <Typography variant="h3">${totalValue.toFixed(2)}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <InventoryIcon sx={{ mr: 1, color: "warning.main" }} />
+                  <Typography variant="h6">Unresolved Alerts</Typography>
+                </Box>
+                <Typography variant="h3">
+                  {alerts.filter((a) => a.status !== "resolved").length}
+                </Typography>
+                <Box sx={{ mt: 1 }}>
+                  <Button size="small" component={Link} href="/alerts">
+                    View Alerts
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
