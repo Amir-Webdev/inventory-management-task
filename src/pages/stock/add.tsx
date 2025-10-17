@@ -41,9 +41,17 @@ export default function AddStock() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 600, mx: "auto" }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 } }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+            textAlign: { xs: "center", sm: "left" },
+          }}
+        >
           Add Stock Record
         </Typography>
         <Box
@@ -61,6 +69,7 @@ export default function AddStock() {
             name="productId"
             value={form.watch("productId") || ""}
             onChange={(e) => form.setValue("productId", Number(e.target.value))}
+            sx={{ mb: 2 }}
           >
             {products.map((product) => (
               <MenuItem key={product.id} value={product.id}>
@@ -79,6 +88,7 @@ export default function AddStock() {
             onChange={(e) =>
               form.setValue("warehouseId", Number(e.target.value))
             }
+            sx={{ mb: 2 }}
           >
             {warehouses.map((warehouse) => (
               <MenuItem key={warehouse.id} value={warehouse.id}>
@@ -96,23 +106,38 @@ export default function AddStock() {
             inputProps={{ min: "0" }}
             value={form.watch("quantity")}
             onChange={(e) => form.setValue("quantity", Number(e.target.value))}
+            sx={{ mb: 3 }}
           />
-          <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
+          <Box
+            sx={{
+              mt: 3,
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Button
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
               disabled={isPending}
+              sx={{ order: { xs: 1, sm: 1 } }}
             >
               {isPending ? "Saving..." : "Add Stock"}
             </Button>
-            <Button fullWidth variant="outlined" component={Link} href="/stock">
+            <Button
+              fullWidth
+              variant="outlined"
+              component={Link}
+              href="/stock"
+              sx={{ order: { xs: 2, sm: 2 } }}
+            >
               Cancel
             </Button>
           </Box>
         </Box>
       </Paper>
-    </Container>
+    </Box>
   );
 }
