@@ -79,7 +79,7 @@ export type Product = z.infer<typeof productSchema>;
 export type Warehouse = z.infer<typeof warehouseSchema>;
 export type Stock = z.infer<typeof stockSchema>;
 export type Transfer = z.infer<typeof transferSchema>;
-export type InventoryOverview = z.infer<typeof inventoryOverviewSchema>;
+export type InventoryOverviewType = z.infer<typeof inventoryOverviewSchema>;
 
 // Response Schemas
 export const productsSchema = z.array(productSchema);
