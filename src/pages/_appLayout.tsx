@@ -64,7 +64,7 @@ export default function AppLayout({ children }: Props) {
             width: 280,
             boxSizing: "border-box",
             position: "relative",
-            height: "100vh",
+            height: "100%",
           },
         }}
       >
@@ -152,30 +152,6 @@ export default function AppLayout({ children }: Props) {
             })}
           </List>
         </Box>
-
-        {/* Sidebar Footer */}
-        <Box sx={{ p: 3, borderTop: "1px solid", borderColor: "divider" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar
-              sx={{
-                bgcolor: "grey.300",
-                width: 32,
-                height: 32,
-                fontSize: "0.875rem",
-              }}
-            >
-              A
-            </Avatar>
-            <Box>
-              <Typography variant="body2" fontWeight={500}>
-                Admin User
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Administrator
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
       </Drawer>
 
       {/* Main Content */}
@@ -217,7 +193,7 @@ export default function AppLayout({ children }: Props) {
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Tooltip title="Notifications">
-                <IconButton>
+                <IconButton onClick={() => router.push("/alerts")}>
                   <Badge color="error">
                     <NotificationsIcon />
                   </Badge>
