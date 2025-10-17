@@ -1,35 +1,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  AppBar,
-  Toolbar,
   Box,
-  Card,
-  CardContent,
-  Chip,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { useWarehouses, useDeleteWarehouse } from "../../hooks/useWarehouses";
+import WarehousesList from "../../components/warehouses/WarehousesList";
+import WarehousesTable from "../../components/warehouses/WarehousesTable";
 
 export default function Warehouses() {
   const theme = useTheme();
@@ -41,6 +26,8 @@ export default function Warehouses() {
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<number | null>(
     null
   );
+
+  const isLoading = isPending || isDeleting;
 
   const handleClickOpen = (id: number) => {
     setSelectedWarehouseId(id);
@@ -100,134 +87,18 @@ export default function Warehouses() {
 
       {/* Mobile Card Layout */}
       {isMobile ? (
-        <Box>
-          {(isPending || isDeleting) && (
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <Typography color="text.secondary">Loading...</Typography>
-            </Box>
-          )}
-
-          {warehouses.map((warehouse) => (
-            <Card key={warehouse.id} sx={{ mb: 2 }}>
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="h6" fontWeight={600}>
-                    {warehouse.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Code: {warehouse.code}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Chip
-                    label={warehouse.location}
-                    size="small"
-                    variant="outlined"
-                    color="primary"
-                  />
-                </Box>
-
-                <Box
-                  sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}
-                >
-                  <IconButton
-                    color="primary"
-                    component={Link}
-                    href={`/warehouses/edit/${warehouse.id}`}
-                    size="small"
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleClickOpen(warehouse.id)}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-
-          {warehouses.length === 0 && !isPending && !isDeleting && (
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <Typography color="text.secondary">
-                No warehouses available.
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        <WarehousesList
+          isLoading={isLoading}
+          onClickOpen={handleClickOpen}
+          warehouses={warehouses}
+        />
       ) : (
         /* Desktop Table Layout */
-        <TableContainer
-          component={Paper}
-          sx={{
-            overflowX: "auto",
-            "&::-webkit-scrollbar": {
-              height: 8,
-            },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "#f1f5f9",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#cbd5e1",
-              borderRadius: 4,
-            },
-          }}
-        >
-          <Table sx={{ minWidth: 500 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>Code</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Location</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(isPending || isDeleting) && (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              )}
-              {warehouses.map((warehouse) => (
-                <TableRow key={warehouse.id} hover>
-                  <TableCell>{warehouse.code}</TableCell>
-                  <TableCell>{warehouse.name}</TableCell>
-                  <TableCell>{warehouse.location}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="primary"
-                      component={Link}
-                      href={`/warehouses/edit/${warehouse.id}`}
-                      size="small"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleClickOpen(warehouse.id)}
-                      size="small"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {warehouses.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    No warehouses available.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <WarehousesTable
+          isLoading={isLoading}
+          onClickOpen={handleClickOpen}
+          warehouses={warehouses}
+        />
       )}
 
       <Dialog open={open} onClose={handleClose}>
