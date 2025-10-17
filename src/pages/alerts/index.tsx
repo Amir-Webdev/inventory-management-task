@@ -92,144 +92,119 @@ export default function AlertsPage() {
   const isLoading = isLoadingProducts || isLoadingStock || isLoadingAlerts;
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <InventoryIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inventory Management System
-          </Typography>
-          <Button color="inherit" component={Link} href="/">
-            Dashboard
-          </Button>
-          <Button color="inherit" component={Link} href="/products">
-            Products
-          </Button>
-          <Button color="inherit" component={Link} href="/warehouses">
-            Warehouses
-          </Button>
-          <Button color="inherit" component={Link} href="/stock">
-            Stock Levels
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <Container sx={{ mt: 4, mb: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4" component="h1">
+          Alerts
+        </Typography>
+      </Box>
 
-      <Container sx={{ mt: 4, mb: 4 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
-          <Typography variant="h4" component="h1">
-            Alerts
-          </Typography>
-        </Box>
-
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <strong>SKU</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Product</strong>
+              </TableCell>
+              <TableCell align="right">
+                <strong>Total</strong>
+              </TableCell>
+              <TableCell align="right">
+                <strong>Reorder Pt</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Classification</strong>
+              </TableCell>
+              <TableCell align="right">
+                <strong>Recommended Order</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Alert</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Actions</strong>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {isLoading && (
               <TableRow>
-                <TableCell>
-                  <strong>SKU</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Product</strong>
-                </TableCell>
-                <TableCell align="right">
-                  <strong>Total</strong>
-                </TableCell>
-                <TableCell align="right">
-                  <strong>Reorder Pt</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Classification</strong>
-                </TableCell>
-                <TableCell align="right">
-                  <strong>Recommended Order</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Alert</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Actions</strong>
+                <TableCell colSpan={8} align="center">
+                  Loading...
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    Loading...
+            )}
+            {!isLoading &&
+              rows.map((row) => (
+                <TableRow
+                  key={row.productId}
+                  sx={{
+                    backgroundColor:
+                      row.classification === "critical" ||
+                      row.classification === "low"
+                        ? "#fff3e0"
+                        : "inherit",
+                  }}
+                >
+                  <TableCell>{row.sku}</TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell align="right">{row.totalQuantity}</TableCell>
+                  <TableCell align="right">{row.reorderPoint}</TableCell>
+                  <TableCell>
+                    {getClassificationChip(row.classification)}
                   </TableCell>
-                </TableRow>
-              )}
-              {!isLoading &&
-                rows.map((row) => (
-                  <TableRow
-                    key={row.productId}
-                    sx={{
-                      backgroundColor:
-                        row.classification === "critical" ||
-                        row.classification === "low"
-                          ? "#fff3e0"
-                          : "inherit",
-                    }}
-                  >
-                    <TableCell>{row.sku}</TableCell>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell align="right">{row.totalQuantity}</TableCell>
-                    <TableCell align="right">{row.reorderPoint}</TableCell>
-                    <TableCell>
-                      {getClassificationChip(row.classification)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.recommendedOrderQty}
-                    </TableCell>
-                    <TableCell>
-                      {row.alert ? (
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Chip label={row.alert.status} size="small" />
-                          {getClassificationChip(row.alert.classification)}
-                        </Stack>
-                      ) : (
-                        <Typography color="text.secondary">None</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        {!row.alert &&
-                          (row.classification === "critical" ||
-                            row.classification === "low") && (
-                            <Button
-                              size="small"
-                              variant="contained"
-                              onClick={() => createAlertIfNeeded(row)}
-                            >
-                              Create Alert
-                            </Button>
-                          )}
-                        {row.alert && row.alert.status !== "resolved" && (
-                          <AlertActions alertId={row.alert.id} />
-                        )}
+                  <TableCell align="right">{row.recommendedOrderQty}</TableCell>
+                  <TableCell>
+                    {row.alert ? (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Chip label={row.alert.status} size="small" />
+                        {getClassificationChip(row.alert.classification)}
                       </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {!isLoading && rows.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No products found.
+                    ) : (
+                      <Typography color="text.secondary">None</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={1}>
+                      {!row.alert &&
+                        (row.classification === "critical" ||
+                          row.classification === "low") && (
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => createAlertIfNeeded(row)}
+                          >
+                            Create Alert
+                          </Button>
+                        )}
+                      {row.alert && row.alert.status !== "resolved" && (
+                        <AlertActions alertId={row.alert.id} />
+                      )}
+                    </Stack>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Container>
-    </>
+              ))}
+            {!isLoading && rows.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  No products found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
 
