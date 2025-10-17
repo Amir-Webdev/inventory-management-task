@@ -27,6 +27,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode, useMemo, useState } from "react";
 import { useTheme } from "@mui/material/styles";
+import { useAlerts } from "../hooks/useAlerts";
 
 type Props = { children: ReactNode };
 
@@ -35,6 +36,8 @@ export default function AppLayout({ children }: Props) {
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const [drawerOpen, setDrawerOpen] = useState(!isMobile);
+  const { data: alerts = [] } = useAlerts();
+  const activeAlerts = alerts.filter((a) => a.status !== "resolved").length;
 
   const navItems = useMemo(
     () => [
@@ -194,7 +197,17 @@ export default function AppLayout({ children }: Props) {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Tooltip title="Notifications">
                 <IconButton onClick={() => router.push("/alerts")}>
-                  <Badge color="error">
+                  <Badge
+                    badgeContent={activeAlerts}
+                    color="error"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.75rem",
+                        minWidth: "16px",
+                        height: "16px",
+                      },
+                    }}
+                  >
                     <NotificationsIcon />
                   </Badge>
                 </IconButton>
