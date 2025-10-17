@@ -48,7 +48,7 @@ function InventoryOverview({
       </Box>
 
       {isNarrow ? (
-        <InventoryList />
+        <InventoryList isLoading={isLoading} data={data} />
       ) : (
         <InventoryTable isLoading={isLoading} data={data} />
       )}
