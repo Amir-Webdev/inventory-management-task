@@ -41,110 +41,78 @@ export default function AddStock() {
   }
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <InventoryIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inventory Management System
-          </Typography>
-          <Button color="inherit" component={Link} href="/">
-            Dashboard
-          </Button>
-          <Button color="inherit" component={Link} href="/products">
-            Products
-          </Button>
-          <Button color="inherit" component={Link} href="/warehouses">
-            Warehouses
-          </Button>
-          <Button color="inherit" component={Link} href="/stock">
-            Stock Levels
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Add Stock Record
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={form.handleSubmit(onSubmit)}
-            noValidate
-            sx={{ mt: 2 }}
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Add Stock Record
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 2 }}
+        >
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            select
+            label="Product"
+            name="productId"
+            value={form.watch("productId") || ""}
+            onChange={(e) => form.setValue("productId", Number(e.target.value))}
           >
-            <TextField
-              margin="normal"
-              required
+            {products.map((product) => (
+              <MenuItem key={product.id} value={product.id}>
+                {product.name} ({product.sku})
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            select
+            label="Warehouse"
+            name="warehouseId"
+            value={form.watch("warehouseId") || ""}
+            onChange={(e) =>
+              form.setValue("warehouseId", Number(e.target.value))
+            }
+          >
+            {warehouses.map((warehouse) => (
+              <MenuItem key={warehouse.id} value={warehouse.id}>
+                {warehouse.name} ({warehouse.code})
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Quantity"
+            name="quantity"
+            type="number"
+            inputProps={{ min: "0" }}
+            value={form.watch("quantity")}
+            onChange={(e) => form.setValue("quantity", Number(e.target.value))}
+          />
+          <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
+            <Button
+              type="submit"
               fullWidth
-              select
-              label="Product"
-              name="productId"
-              value={form.watch("productId") || ""}
-              onChange={(e) =>
-                form.setValue("productId", Number(e.target.value))
-              }
+              variant="contained"
+              color="primary"
+              disabled={isPending}
             >
-              {products.map((product) => (
-                <MenuItem key={product.id} value={product.id}>
-                  {product.name} ({product.sku})
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              select
-              label="Warehouse"
-              name="warehouseId"
-              value={form.watch("warehouseId") || ""}
-              onChange={(e) =>
-                form.setValue("warehouseId", Number(e.target.value))
-              }
-            >
-              {warehouses.map((warehouse) => (
-                <MenuItem key={warehouse.id} value={warehouse.id}>
-                  {warehouse.name} ({warehouse.code})
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Quantity"
-              name="quantity"
-              type="number"
-              inputProps={{ min: "0" }}
-              value={form.watch("quantity")}
-              onChange={(e) =>
-                form.setValue("quantity", Number(e.target.value))
-              }
-            />
-            <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                disabled={isPending}
-              >
-                {isPending ? "Saving..." : "Add Stock"}
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                component={Link}
-                href="/stock"
-              >
-                Cancel
-              </Button>
-            </Box>
+              {isPending ? "Saving..." : "Add Stock"}
+            </Button>
+            <Button fullWidth variant="outlined" component={Link} href="/stock">
+              Cancel
+            </Button>
           </Box>
-        </Paper>
-      </Container>
-    </>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
