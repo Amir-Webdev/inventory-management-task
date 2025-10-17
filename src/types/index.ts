@@ -101,3 +101,13 @@ export const alertSchema = z.object({
 });
 export type Alert = z.infer<typeof alertSchema>;
 export const alertsSchema = z.array(alertSchema);
+
+export type InventoryItem = {
+  id: string;
+  name: string;
+  category?: string;
+  unitCost?: number;
+  totalQuantity?: number;
+  reorderPoint?: number;
+  isLowStock?: boolean;
+};
