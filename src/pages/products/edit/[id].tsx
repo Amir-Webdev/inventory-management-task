@@ -70,114 +70,89 @@ export default function EditProduct() {
   }
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <InventoryIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inventory Management System
-          </Typography>
-          <Button color="inherit" component={Link} href="/">
-            Dashboard
-          </Button>
-          <Button color="inherit" component={Link} href="/products">
-            Products
-          </Button>
-          <Button color="inherit" component={Link} href="/warehouses">
-            Warehouses
-          </Button>
-          <Button color="inherit" component={Link} href="/stock">
-            Stock Levels
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Edit Product
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={form.handleSubmit(onSubmit)}
-            noValidate
-            sx={{ mt: 2 }}
-          >
-            <TextField
-              margin="normal"
-              required
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Edit Product
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 2 }}
+        >
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="SKU"
+            name="sku"
+            value={form.watch("sku")}
+            onChange={(e) => form.setValue("sku", e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Product Name"
+            name="name"
+            value={form.watch("name")}
+            onChange={(e) => form.setValue("name", e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Category"
+            name="category"
+            value={form.watch("category")}
+            onChange={(e) => form.setValue("category", e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Unit Cost"
+            name="unitCost"
+            type="number"
+            inputProps={{ step: "0.01", min: "0" }}
+            value={form.watch("unitCost")}
+            onChange={(e) => form.setValue("unitCost", Number(e.target.value))}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Reorder Point"
+            name="reorderPoint"
+            type="number"
+            inputProps={{ min: "0" }}
+            value={form.watch("reorderPoint")}
+            onChange={(e) =>
+              form.setValue("reorderPoint", Number(e.target.value))
+            }
+          />
+          <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
+            <Button
+              type="submit"
               fullWidth
-              label="SKU"
-              name="sku"
-              value={form.watch("sku")}
-              onChange={(e) => form.setValue("sku", e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
+              variant="contained"
+              color="primary"
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Update Product"}
+            </Button>
+            <Button
               fullWidth
-              label="Product Name"
-              name="name"
-              value={form.watch("name")}
-              onChange={(e) => form.setValue("name", e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Category"
-              name="category"
-              value={form.watch("category")}
-              onChange={(e) => form.setValue("category", e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Unit Cost"
-              name="unitCost"
-              type="number"
-              inputProps={{ step: "0.01", min: "0" }}
-              value={form.watch("unitCost")}
-              onChange={(e) =>
-                form.setValue("unitCost", Number(e.target.value))
-              }
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Reorder Point"
-              name="reorderPoint"
-              type="number"
-              inputProps={{ min: "0" }}
-              value={form.watch("reorderPoint")}
-              onChange={(e) =>
-                form.setValue("reorderPoint", Number(e.target.value))
-              }
-            />
-            <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                disabled={isSaving}
-              >
-                {isSaving ? "Saving..." : "Update Product"}
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                component={Link}
-                href="/products"
-              >
-                Cancel
-              </Button>
-            </Box>
+              variant="outlined"
+              component={Link}
+              href="/products"
+            >
+              Cancel
+            </Button>
           </Box>
-        </Paper>
-      </Container>
-    </>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
