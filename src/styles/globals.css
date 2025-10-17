@@ -86,3 +86,73 @@ textarea:focus-visible {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
     0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
+
+/* Responsive utilities */
+.responsive-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table table {
+  min-width: 600px;
+}
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 600px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  .mobile-stack {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .mobile-text-center {
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .tablet-hidden {
+    display: none !important;
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 600px) {
+  .responsive-h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .responsive-h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .responsive-h3 {
+    font-size: 1.125rem !important;
+  }
+
+  .responsive-h4 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Responsive spacing */
+@media (max-width: 600px) {
+  .mobile-p-2 {
+    padding: 1rem !important;
+  }
+
+  .mobile-mb-2 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mobile-mt-2 {
+    margin-top: 1rem !important;
+  }
+}
