@@ -10,6 +10,7 @@ import {
   AppBar,
   Toolbar,
   MenuItem,
+  Alert,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,12 +19,18 @@ import { transferFormSchema, type TransferFormInput } from "../../types";
 import { useProducts } from "../../hooks/useProducts";
 import { useWarehouses } from "../../hooks/useWarehouses";
 import { useCreateTransfer } from "../../hooks/useTransfers";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { getErrorMessage } from "../../lib/api";
 
 export default function AddTransfer() {
   const router = useRouter();
   const { data: products = [] } = useProducts();
   const { data: warehouses = [] } = useWarehouses();
   const { mutateAsync: createTransfer, isPending } = useCreateTransfer();
+  const [error, setError] = useState<string | null>(null);
+  
   const form = useForm<TransferFormInput, any, TransferFormInput>({
     resolver: zodResolver(transferFormSchema) as any,
     defaultValues: {
@@ -35,9 +42,22 @@ export default function AddTransfer() {
   });
 
   async function onSubmit(values: TransferFormInput) {
-    if (values.receivingWarehouseId === values.sendingWarehouseId) return;
-    await createTransfer(values);
-    router.push("/transfers");
+    if (values.receivingWarehouseId === values.sendingWarehouseId) {
+      setError("Sending and receiving warehouses cannot be the same");
+      return;
+    }
+    
+    setError(null);
+    
+    try {
+      await createTransfer(values);
+      toast.success("Transfer created successfully!");
+      router.push("/transfers");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err as AxiosError);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   }
 
   return (
@@ -54,6 +74,11 @@ export default function AddTransfer() {
         >
           Add Transfer Record
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <Box
           component="form"
           onSubmit={form.handleSubmit(onSubmit)}
