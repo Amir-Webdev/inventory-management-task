@@ -14,7 +14,7 @@ interface Props {
   stock: any[];
   getProductName: (id: number) => string;
   getWarehouseName: (id: number) => string;
-  onDelete: (id: number) => void;
+  onClickOpen: (id: number) => void;
   isLoading: boolean;
 }
 
@@ -22,7 +22,7 @@ export default function StockList({
   stock,
   getProductName,
   getWarehouseName,
-  onDelete,
+  onClickOpen,
   isLoading,
 }: Props) {
   if (isLoading) {
@@ -77,7 +77,7 @@ export default function StockList({
               </IconButton>
               <IconButton
                 color="error"
-                onClick={() => onDelete(item.id)}
+                onClick={() => onClickOpen(item.id)}
                 size="small"
               >
                 <DeleteIcon />

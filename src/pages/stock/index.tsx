@@ -14,11 +14,14 @@ import {
   useTheme,
 } from "@mui/material";
 
-import { useStock } from "../../hooks/useStock";
+import { useDeleteStock, useStock } from "../../hooks/useStock";
 import { useProducts } from "../../hooks/useProducts";
 import { useWarehouses } from "../../hooks/useWarehouses";
 import StockTable from "../../components/stock/StockTable";
 import StockList from "../../components/stock/StockList";
+import toast from "react-hot-toast";
+import { getErrorMessage } from "../../lib/api";
+import { AxiosError } from "axios";
 
 export default function StockPage() {
   const theme = useTheme();
@@ -27,11 +30,24 @@ export default function StockPage() {
   const { data: products = [], isPending: isLoadingProducts } = useProducts();
   const { data: warehouses = [], isPending: isLoadingWarehouses } =
     useWarehouses();
+  const { mutateAsync: deleteStock, isPending: isDeleting } = useDeleteStock();
 
   const [open, setOpen] = useState(false);
   const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async () => {
+    try {
+      await deleteStock(selectedStockId!);
+      toast.success("Stock Deleted Successfully!");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err as AxiosError);
+      toast.error(errorMessage);
+    } finally {
+      handleClose();
+    }
+  };
+
+  const handleClickOpen = (id: number) => {
     setSelectedStockId(id);
     setOpen(true);
   };
@@ -51,7 +67,8 @@ export default function StockPage() {
     return warehouse ? `${warehouse.name} (${warehouse.code})` : "Unknown";
   };
 
-  const isLoading = isLoadingStock || isLoadingProducts || isLoadingWarehouses;
+  const isLoading =
+    isLoadingStock || isLoadingProducts || isLoadingWarehouses || isDeleting;
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3 } }}>
@@ -93,7 +110,7 @@ export default function StockPage() {
           stock={stock}
           getProductName={getProductName}
           getWarehouseName={getWarehouseName}
-          onDelete={handleDelete}
+          onClickOpen={handleClickOpen}
           isLoading={isLoading}
         />
       ) : (
@@ -101,7 +118,7 @@ export default function StockPage() {
           stock={stock}
           getProductName={getProductName}
           getWarehouseName={getWarehouseName}
-          onDelete={handleDelete}
+          onClickOpen={handleClickOpen}
           isLoading={isLoading}
         />
       )}
@@ -117,7 +134,7 @@ export default function StockPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button color="error" onClick={handleClose} autoFocus>
+          <Button color="error" onClick={handleDelete} autoFocus>
             Delete
           </Button>
         </DialogActions>
