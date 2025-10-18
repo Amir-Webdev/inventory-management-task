@@ -1,115 +1,80 @@
 # Multi-Warehouse Inventory Management System
 
 ## Overview
-Enhance the existing Multi-Warehouse Inventory Management System built with Next.js and Material-UI (MUI) for GreenSupply Co, a sustainable product distribution company. The current system is functional but needs significant improvements to be production-ready.
+
+A comprehensive Multi-Warehouse Inventory Management System built with Next.js and Material-UI (MUI) for GreenSupply Co, a sustainable product distribution company. This production-ready system efficiently tracks inventory across multiple warehouse locations, manages stock movements, monitors inventory values, and prevents stockouts.
 
 ## 🎯 Business Context
-GreenSupply Co distributes eco-friendly products across multiple warehouse locations throughout North America. They need to efficiently track inventory across warehouses, manage stock movements, monitor inventory values, and prevent stockouts. This system is critical for their daily operations and customer satisfaction.
+
+GreenSupply Co distributes eco-friendly products across multiple warehouse locations throughout North America. This system provides warehouse managers with actionable insights, streamlines stock transfers between warehouses, and proactively manages inventory levels through intelligent alert systems.
 
 ## 🛠️ Tech Stack
-- [Next.js](https://nextjs.org/) - React framework
-- [Material-UI (MUI)](https://mui.com/) - UI component library
-- [React](https://reactjs.org/) - JavaScript library
-- JSON file storage (for this assessment)
 
-## 📋 Current Features (Already Implemented)
-The basic system includes:
-- ✅ Products management (CRUD operations)
-- ✅ Warehouse management (CRUD operations)
-- ✅ Stock level tracking per warehouse
-- ✅ Basic dashboard with inventory overview
-- ✅ Navigation between pages
-- ✅ Data persistence using JSON files
+- **Next.js 15.0.3** - React framework with Pages Router
+- **Material-UI (MUI) 6.1.7** - Modern UI component library
+- **React 18.2.0** - JavaScript library
+- **TypeScript 5.9.3** - Type safety and development experience
+- **React Query (@tanstack/react-query 5.90.3)** - Server state management
+- **React Hook Form 7.65.0** - Form handling with validation
+- **Zod 4.1.12** - Schema validation
+- **Axios 1.12.2** - HTTP client
+- **React Hot Toast 2.6.0** - User notifications
+- **JSON file storage** - Data persistence (for assessment)
 
-**⚠️ Note:** The current UI is intentionally basic. We want to see YOUR design skills and creativity.
+## ✨ Key Features
 
----
+### 🏠 Enhanced Dashboard
 
-## 🚀 Your Tasks (Complete ALL 3)
+- **Modern, Professional UI** with eco-friendly design theme
+- **Key Business Metrics** including inventory value, stock levels, warehouse counts, and active alerts
+- **Responsive Design** that works seamlessly across all device sizes
+- **Real-time Data** with proper loading states and error handling
+- **Quick Actions** for common warehouse operations
+- **Inventory Overview** with enhanced usability and visual indicators
 
----
+### 📦 Stock Transfer System
 
-## Task 1: Redesign & Enhance the Dashboard
+- **Complete Transfer Workflow** with proper business logic and validation
+- **Data Integrity** with automatic stock level updates across warehouses
+- **Transfer History** tracking with comprehensive audit trail
+- **Intuitive UI** for warehouse managers performing daily operations
+- **Error Handling** with user-friendly feedback and validation
 
-**Objective:** Transform the basic dashboard into a professional, insightful command center for warehouse operations.
+### 🚨 Low Stock Alert & Reorder System
 
-### Requirements:
+- **Intelligent Alert System** that identifies products needing reordering
+- **Smart Classification** (Critical, Low, Adequate, Overstocked)
+- **Actionable Recommendations** with suggested reorder quantities
+- **Status Workflow** (New → Acknowledged → Ordered → Resolved)
+- **Dashboard Integration** for immediate visibility of critical alerts
 
-Redesign the dashboard to provide warehouse managers with actionable insights at a glance. Your implementation should include:
+## 📋 System Architecture
 
-- **Modern, professional UI** appropriate for a sustainable/eco-friendly company
-- **Key business metrics** (inventory value, stock levels, warehouse counts, etc.)
-- **Data visualizations** using a charting library of your choice
-- **Enhanced inventory overview** with improved usability
-- **Fully responsive design** that works across all device sizes
-- **Proper loading states** and error handling
+### Data Models
 
-Focus on creating an interface that balances visual appeal with practical functionality for daily warehouse operations.
+- **Products**: SKU, name, category, unit cost, reorder point
+- **Warehouses**: Name, location, code
+- **Stock**: Product-warehouse quantity tracking
+- **Transfers**: Inter-warehouse movement records
+- **Alerts**: Low stock notifications with status tracking
 
----
+### API Endpoints
 
-## Task 2: Implement Stock Transfer System
+- `/api/products` - Product CRUD operations
+- `/api/warehouses` - Warehouse management
+- `/api/stock` - Stock level management
+- `/api/transfers` - Transfer operations
+- `/api/alerts` - Alert management
 
-**Objective:** Build a complete stock transfer workflow with proper business logic, validation, and data integrity.
-
-### Requirements:
-
-**A. Stock Transfer System**
-
-Build a complete stock transfer system that allows moving inventory between warehouses. Your implementation should include:
-
-- Data persistence for transfer records (create `data/transfers.json`)
-- API endpoints for creating and retrieving transfers
-- Proper validation and error handling
-- Stock level updates across warehouses
-- Transfer history tracking
-
-Design the data structure, API contracts, and business logic as you see fit for a production system.
-
-**B. Transfer Page UI**
-
-Create a `/transfers` page that provides:
-- A form to initiate stock transfers between warehouses
-- Transfer history view
-- Appropriate error handling and user feedback
-
-Design the interface to be intuitive for warehouse managers performing daily operations.
-
----
-
-## Task 3: Build Low Stock Alert & Reorder System
-
-**Objective:** Create a practical system that helps warehouse managers identify and act on low stock situations.
-
-### Requirements:
-
-Build a low stock alert and reorder recommendation system that helps warehouse managers proactively manage inventory levels.
-
-**Key Functionality:**
-- Identify products that need reordering based on current stock levels and reorder points
-- Categorize inventory by stock status (critical, low, adequate, overstocked)
-- Provide actionable reorder recommendations
-- Allow managers to track and update alert status
-- Integrate alerts into the main dashboard
-
-**Implementation Details:**
-- Create an `/alerts` page for viewing and managing alerts
-- Calculate stock across all warehouses
-- Persist alert tracking data (create `data/alerts.json`)
-- Design appropriate status workflows and user actions
-
-Use your judgment to determine appropriate thresholds, calculations, and user workflows for a production inventory management system.
-
----
-
-## 📦 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (v16 or higher recommended)
 - Modern web browser (Chrome, Firefox, Safari, or Edge)
-- Screen recording software for video submission (Loom, OBS, QuickTime, etc.)
 
 ### Installation
+
 ```bash
 # Install dependencies
 npm install
@@ -120,125 +85,144 @@ npm run dev
 # Open browser to http://localhost:3000
 ```
 
-### Project Structure
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run next's lint
+npm run type-check   # Run TypeScript type checking
+```
+
+## 📁 Project Structure
+
 ```
 inventory-management-task/
-├── data/                  # JSON data files
+├── data/                    # JSON data files
+│   ├── products.json       # Product catalog
+│   ├── warehouses.json     # Warehouse locations
+│   ├── stock.json          # Stock levels
+│   ├── transfers.json      # Transfer history
+│   └── alerts.json         # Alert tracking
 ├── src/
-│   └── pages/            # Next.js pages and API routes
+│   ├── components/         # UI components
+│   │   ├── dashboard/      # Dashboard components
+│   │   ├── products/       # Product management
+│   │   ├── warehouses/     # Warehouse management
+│   │   ├── stock/          # Stock management
+│   │   ├── transfers/      # Transfer system
+│   │   └── alerts/         # Alert system
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utility functions
+│   ├── pages/              # Next.js pages and API routes
+│   ├── styles/             # Global styles
+│   └── types/              # TypeScript type definitions
 └── package.json
 ```
 
-The existing codebase includes product, warehouse, and stock management features. Explore the code to understand the current implementation before starting your tasks.
+## 🎨 Design System
+
+### Theme
+
+- **Color Palette**: Eco-friendly greens and blues with professional grays
+- **Typography**: Inter font family for modern readability
+- **Spacing**: Consistent 8px grid system
+- **Shadows**: Subtle elevation with hover effects
+- **Border Radius**: 12px for cards, 8px for buttons
+
+### Responsive Breakpoints
+
+- **Mobile**: < 700px (card layout)
+- **Tablet**: 700px - 1024px (hybrid layout)
+- **Desktop**: > 1024px (full table layout)
+
+## 🔧 Technical Implementation
+
+### State Management
+
+- **React Query** for server state management
+- **React Hook Form** for form state
+- **Zod** for runtime validation
+- **Custom hooks** for data fetching and mutations
+
+### Data Validation
+
+- **Zod schemas** for type-safe validation
+- **Form validation** with real-time feedback
+- **API validation** with proper error handling
+- **Business logic validation** (e.g., transfer constraints)
+
+### Performance Optimizations
+
+- **Code splitting** with Next.js dynamic imports
+- **Optimistic updates** for better UX
+- **Efficient re-renders** with proper dependency arrays
+
+### Data Setup
+
+```bash
+# The system comes with sample data in the data/ directory
+# Modify values in JSON files to test different scenarios
+```
+
+## 📊 Implementation Summary
+
+### Developer Information
+
+- **Name**: Amirhossien Mosavi
+- **Completion Time**: ~20hours
+- **Date**: 10/18/2025
+
+### Features Completed ✅
+
+- ✅ **Task 1**: Redesigned Dashboard with modern UI and responsive design
+- ✅ **Task 2**: Complete Stock Transfer System with validation and history
+- ✅ **Task 3**: Low Stock Alert & Reorder System with intelligent classification
+- ✅ **Additional**: Enhanced UX with loading states, error handling, and notifications
+
+### Key Technical Decisions
+
+1. **Architecture**: Next.js with Pages Router for modern React patterns
+2. **State Management**: React Query for efficient server state management
+3. **Form Handling**: React Hook Form with Zod validation for type safety
+4. **UI Framework**: Material-UI for consistent, accessible components
+5. **Data Persistence**: JSON files for simplicity (easily replaceable with database)
+6. **Responsive Design**: Mobile-first approach with progressive enhancement
+7. **Error Handling**: Comprehensive error boundaries and user feedback
+8. **Performance**: Optimized re-renders and efficient data fetching
+
+### Known Limitations
+
+- **Data Persistence**: Currently uses JSON files (production would need database)
+- **Authentication**: No user authentication system implemented
+- **Bulk Operations**: Limited bulk transfer capabilities
+- **Reporting**: Basic metrics only (could be enhanced with advanced analytics)
+
+### New Dependencies Added
+
+- **@tanstack/react-query**: Server state management and caching
+- **@hookform/resolvers**: Form validation integration
+- **react-hook-form**: Advanced form handling
+- **zod**: Runtime type validation
+- **react-hot-toast**: User notification system
+- **axios**: HTTP client for API calls
+- **typescript** - Type safety and development experience
+
+### Video Walkthrough
+
+[Link to video demonstration will be provided here soon]
+
+### Live Demo
+
+[text](https://inventory-management-task-pied.vercel.app/)
+
+- **User cannot Add or Edit Any Data on Live Demo**
+- Read-only operations (fs.readFileSync) are allowed on Vercel
+- Write operations (fs.writeFileSync) are NOT allowed on Vercel
 
 ---
 
-## 📝 Submission Requirements
+## 📝 License
 
-### 1. Code Submission
-- Push your code to **your own GitHub repository** (fork or new repo)
-- Clear commit history showing your progression
-- Update `package.json` with any new dependencies
-- Application must run with: `npm install && npm run dev`
-
-### 2. Video Walkthrough (5-10 minutes) - REQUIRED ⚠️
-
-Record a video demonstration covering:
-
-**Feature Demo (4-5 minutes)**
-- Redesigned dashboard walkthrough (demonstrate responsiveness)
-- Stock transfer workflow (show both successful and error scenarios)
-- Alert system functionality
-
-**Code Explanation (3-4 minutes)**
-- Key technical decisions and approach
-- Most challenging aspects and solutions
-- Code structure highlights
-
-**Reflection (1-2 minutes)**
-- What you're proud of
-- Known limitations or trade-offs
-- What you'd improve with more time
-
-**Format:** Upload to YouTube (unlisted), Loom, or similar platform. Include link in your README.
-
-### 3. Update This README
-
-Add an implementation summary at the bottom with:
-- Your name and completion time
-- Features completed
-- Key technical decisions
-- Known limitations
-- Testing instructions
-- Video walkthrough link
-- Any new dependencies added
-
----
-
-## ⏰ Timeline
-
-**Deadline:** 3 days (72 hours) from receiving this assignment
-
-Submit:
-1. GitHub repository link
-2. Video walkthrough link
-3. Updated README with implementation notes
-
-**Estimated effort:** 15-18 hours total
-
-**Note:** This timeline reflects real-world project constraints. Manage your time effectively and prioritize core functionality over bonus features.
-
----
-
-## 🏆 Optional Enhancements
-
-If you have extra time, consider adding:
-- Live deployment (Vercel/Netlify)
-- Dark mode
-- Export functionality (CSV/PDF)
-- Keyboard shortcuts
-- Advanced filtering
-- Accessibility features
-- Unit tests
-- TypeScript
-- Additional features you think add value
-
-**Important:** Complete all 3 core tasks before attempting bonuses. Quality of required features matters more than quantity of extras.
-
----
-
-## 🤔 Frequently Asked Questions
-
-**Q: Can I use additional libraries?**
-A: Yes! Add them to package.json and document your reasoning.
-
-**Q: What if I encounter technical blockers?**
-A: Document the issue, explain what you tried, and move forward with the next task. Include this in your video explanation.
-
-**Q: Can I modify the existing data structure?**
-A: You can add fields, but don't break the existing structure that other features depend on.
-
-**Q: What if I can't complete everything?**
-A: Submit what you have with clear documentation. Quality over quantity.
-
-**Q: How will my submission be used?**
-A: This is solely for technical assessment. Your code will not be used commercially.
-
----
-
-## 🚀 Final Notes
-
-This assessment is designed to simulate real-world development scenarios. We're looking for:
-- Clean, maintainable code
-- Thoughtful problem-solving
-- Professional UI/UX
-- Proper error handling
-- Good communication skills (via your video)
-
-Do your best work, document your decisions, and show us how you approach building production applications.
-
-Good luck! 💪
-
----
-
-**Setup issues?** Verify Node.js is installed and you're using a modern browser. If problems persist, document them in your submission.
+This project is created for assessment purposes. All rights reserved.
