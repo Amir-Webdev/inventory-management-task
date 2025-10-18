@@ -10,6 +10,7 @@ import {
   Chip,
   Stack,
   Button,
+  Box,
 } from "@mui/material";
 import AlertActions from "./AlertActions";
 
@@ -23,7 +24,9 @@ export default function AlertsTable({
     <TableContainer
       component={Paper}
       sx={{
-        overflowX: "auto",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        maxWidth: "80%",
         "&::-webkit-scrollbar": { height: 8 },
         "&::-webkit-scrollbar-track": { backgroundColor: "#f1f5f9" },
         "&::-webkit-scrollbar-thumb": {

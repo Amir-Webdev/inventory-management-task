@@ -4,8 +4,10 @@ import { useUpdateAlert } from "../../hooks/useAlerts";
 export default function AlertActions({ alertId }: { alertId: number }) {
   const { mutate: update } = useUpdateAlert(alertId);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = false; // Temporarily force desktop layout to test
 
+  // Since this component is used in both AlertsTable (desktop) and AlertsList (mobile),
+  // we need to handle both layouts
   if (isMobile) {
     // Mobile layout: stack buttons vertically with full width
     return (
@@ -38,11 +40,17 @@ export default function AlertActions({ alertId }: { alertId: number }) {
 
   // Desktop layout: horizontal buttons
   return (
-    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-      <Button size="small" onClick={() => update({ status: "acknowledged" })}>
+    <Stack direction="row" spacing={1}>
+      <Button 
+        size="small" 
+        onClick={() => update({ status: "acknowledged" })}
+      >
         Acknowledge
       </Button>
-      <Button size="small" onClick={() => update({ status: "ordered" })}>
+      <Button 
+        size="small" 
+        onClick={() => update({ status: "ordered" })}
+      >
         Mark Ordered
       </Button>
       <Button
