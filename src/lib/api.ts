@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { ZodSchema } from "zod";
+import { checkParseError } from "./checkParseError";
 
 export const api = axios.create({
   baseURL: "",
@@ -7,11 +8,18 @@ export const api = axios.create({
 
 export function parseOrThrow<T>(schema: ZodSchema<T>, data: unknown): T {
   const parsed = schema.safeParse(data);
-  if (!parsed.success) {
-    // For visibility in dev
-    console.error("Zod parse error:", parsed.error.flatten());
-    throw new Error("Invalid response shape");
+  checkParseError(parsed);
+  return parsed.data as T;
+}
+
+export function getErrorMessage(error: AxiosError): string {
+  // Try to extract error message from response
+  const responseData = error.response?.data as { message?: string };
+  if (responseData?.message) {
+    return responseData.message;
   }
-  return parsed.data;
+  
+  // Fallback to axios error message
+  return error.message || "An unexpected error occurred";
 }
 
