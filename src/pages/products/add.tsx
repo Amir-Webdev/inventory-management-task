@@ -9,16 +9,23 @@ import {
   Paper,
   AppBar,
   Toolbar,
+  Alert,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { productFormSchema, type ProductFormInput } from "../../types";
 import { useCreateProduct } from "../../hooks/useProducts";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { getErrorMessage } from "../../lib/api";
 
 export default function AddProduct() {
   const router = useRouter();
   const { mutateAsync: createProduct, isPending } = useCreateProduct();
+  const [error, setError] = useState<string | null>(null);
+  
   const form = useForm<ProductFormInput, any, ProductFormInput>({
     resolver: zodResolver(productFormSchema) as any,
     defaultValues: {
@@ -31,8 +38,17 @@ export default function AddProduct() {
   });
 
   async function onSubmit(values: ProductFormInput) {
-    await createProduct(values);
-    router.push("/products");
+    setError(null);
+    
+    try {
+      await createProduct(values);
+      toast.success("Product created successfully!");
+      router.push("/products");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err as AxiosError);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   }
 
   return (
@@ -49,6 +65,11 @@ export default function AddProduct() {
         >
           Add New Product
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <Box
           component="form"
           onSubmit={form.handleSubmit(onSubmit)}
