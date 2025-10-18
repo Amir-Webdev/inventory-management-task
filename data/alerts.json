@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "productId": 4,
+    "totalQuantity": 0,
+    "reorderPoint": 750,
+    "status": "new",
+    "classification": "critical",
+    "id": 1,
+    "createdAt": "2025-10-18T12:47:35.201Z",
+    "updatedAt": "2025-10-18T12:47:35.201Z"
+  }
+]
