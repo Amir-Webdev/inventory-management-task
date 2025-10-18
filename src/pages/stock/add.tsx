@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -11,6 +11,7 @@ import {
   AppBar,
   Toolbar,
   MenuItem,
+  Alert,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,20 +25,34 @@ import {
 import { useProducts } from "../../hooks/useProducts";
 import { useWarehouses } from "../../hooks/useWarehouses";
 import { useCreateStock } from "../../hooks/useStock";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { getErrorMessage } from "../../lib/api";
 
 export default function AddStock() {
   const router = useRouter();
   const { data: products = [] } = useProducts();
   const { data: warehouses = [] } = useWarehouses();
   const { mutateAsync: createStock, isPending } = useCreateStock();
+  const [error, setError] = useState<string | null>(null);
+  
   const form = useForm<StockFormInput, any, StockFormInput>({
     resolver: zodResolver(stockFormSchema) as any,
     defaultValues: { productId: 0, warehouseId: 0, quantity: 0 },
   });
 
   async function onSubmit(values: StockFormInput) {
-    await createStock(values);
-    router.push("/stock");
+    setError(null);
+    
+    try {
+      await createStock(values);
+      toast.success("Stock record created successfully!");
+      router.push("/stock");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err as AxiosError);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   }
 
   return (
@@ -54,6 +69,11 @@ export default function AddStock() {
         >
           Add Stock Record
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <Box
           component="form"
           onSubmit={form.handleSubmit(onSubmit)}
