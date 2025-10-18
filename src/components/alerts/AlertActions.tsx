@@ -4,7 +4,7 @@ import { useUpdateAlert } from "../../hooks/useAlerts";
 export default function AlertActions({ alertId }: { alertId: number }) {
   const { mutate: update } = useUpdateAlert(alertId);
   const theme = useTheme();
-  const isMobile = false; // Temporarily force desktop layout to test
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // Since this component is used in both AlertsTable (desktop) and AlertsList (mobile),
   // we need to handle both layouts
