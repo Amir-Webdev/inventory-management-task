@@ -9,16 +9,23 @@ import {
   Paper,
   AppBar,
   Toolbar,
+  Alert,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { warehouseFormSchema, type WarehouseFormInput } from "../../types";
 import { useCreateWarehouse } from "../../hooks/useWarehouses";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { getErrorMessage } from "../../lib/api";
 
 export default function AddWarehouse() {
   const router = useRouter();
   const { mutateAsync: createWarehouse, isPending } = useCreateWarehouse();
+  const [error, setError] = useState<string | null>(null);
+  
   const form = useForm<WarehouseFormInput, any, WarehouseFormInput>({
     resolver: zodResolver(warehouseFormSchema) as any,
     defaultValues: {
@@ -29,8 +36,17 @@ export default function AddWarehouse() {
   });
 
   async function onSubmit(values: WarehouseFormInput) {
-    await createWarehouse(values);
-    router.push("/warehouses");
+    setError(null);
+    
+    try {
+      await createWarehouse(values);
+      toast.success("Warehouse created successfully!");
+      router.push("/warehouses");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err as AxiosError);
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   }
 
   return (
@@ -47,6 +63,11 @@ export default function AddWarehouse() {
         >
           Add New Warehouse
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         <Box
           component="form"
           onSubmit={form.handleSubmit(onSubmit)}
