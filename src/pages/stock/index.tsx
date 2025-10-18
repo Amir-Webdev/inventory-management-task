@@ -36,6 +36,7 @@ export default function StockPage() {
   const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
 
   const handleDelete = async () => {
+    if (!selectedStockId) return;
     try {
       await deleteStock(selectedStockId!);
       toast.success("Stock Deleted Successfully!");

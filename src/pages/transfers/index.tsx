@@ -17,6 +17,9 @@ import { useWarehouses } from "../../hooks/useWarehouses";
 import { useState } from "react";
 import TransfersTable from "../../components/transfers/TransfersTable";
 import TransfersList from "../../components/transfers/TransfersList";
+import { getErrorMessage } from "../../lib/api";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 export default function Products() {
   const theme = useTheme();
@@ -64,9 +67,12 @@ export default function Products() {
     if (!selectedTransferId) return;
     try {
       await deleteTransfer(selectedTransferId);
-      handleClose();
+      toast.success("Transfer Deleted Successfully!");
     } catch (error) {
-      console.error("Error deleting product:", error);
+      const errorMessage = getErrorMessage(error as AxiosError);
+      toast.error(errorMessage);
+    } finally {
+      handleClose();
     }
   }
 

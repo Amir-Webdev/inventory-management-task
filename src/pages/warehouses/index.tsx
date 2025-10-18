@@ -15,6 +15,9 @@ import {
 import { useWarehouses, useDeleteWarehouse } from "../../hooks/useWarehouses";
 import WarehousesList from "../../components/warehouses/WarehousesList";
 import WarehousesTable from "../../components/warehouses/WarehousesTable";
+import toast from "react-hot-toast";
+import { getErrorMessage } from "../../lib/api";
+import { AxiosError } from "axios";
 
 export default function Warehouses() {
   const theme = useTheme();
@@ -40,11 +43,15 @@ export default function Warehouses() {
   };
 
   const handleDelete = async () => {
+    if (!selectedWarehouseId) return;
     try {
       await deleteWarehouse(selectedWarehouseId!);
-      handleClose();
+      toast.success("Warehouse Deleted Successfully!");
     } catch (error) {
-      console.error("Error deleting warehouse:", error);
+      const errorMessage = getErrorMessage(error as AxiosError);
+      toast.error(errorMessage);
+    } finally {
+      handleClose();
     }
   };
 

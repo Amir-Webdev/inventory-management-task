@@ -15,6 +15,9 @@ import {
 import { useProducts, useDeleteProduct } from "../../hooks/useProducts";
 import ProductsTable from "../../components/products/ProductsTable";
 import ProductsList from "../../components/products/ProductsList";
+import { getErrorMessage } from "../../lib/api";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 export default function Products() {
   const theme = useTheme();
@@ -39,11 +42,15 @@ export default function Products() {
   };
 
   const handleDelete = async () => {
+    if (!selectedProductId) return;
     try {
       await deleteProduct(selectedProductId!);
-      handleClose();
+      toast.success("Product Deleted Successfully!");
     } catch (error) {
-      console.error("Error deleting product:", error);
+      const errorMessage = getErrorMessage(error as AxiosError);
+      toast.error(errorMessage);
+    } finally {
+      handleClose();
     }
   };
 
