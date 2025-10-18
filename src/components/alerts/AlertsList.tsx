@@ -107,6 +107,7 @@ export default function AlertsList({
                 gap: 1,
                 justifyContent: "flex-end",
                 flexWrap: "wrap",
+                width: "100%",
               }}
             >
               {!row.alert &&
@@ -116,12 +117,15 @@ export default function AlertsList({
                     size="small"
                     variant="contained"
                     onClick={() => createAlertIfNeeded(row)}
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
                   >
                     Create Alert
                   </Button>
                 )}
               {row.alert && row.alert.status !== "resolved" && (
-                <AlertActions alertId={row.alert.id} />
+                <Box sx={{ width: "100%" }}>
+                  <AlertActions alertId={row.alert.id} />
+                </Box>
               )}
             </Box>
           </CardContent>
