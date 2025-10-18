@@ -211,11 +211,11 @@ inventory-management-task/
 
 ### Video Walkthrough
 
-[Link to video demonstration will be provided here soon]
+[Video Link](https://youtu.be/d2BY6zxFxMo)
 
 ### Live Demo
 
-[text](https://inventory-management-task-pied.vercel.app/)
+[Live Demo Here](https://inventory-management-task-pied.vercel.app/)
 
 - **User cannot Add or Edit Any Data on Live Demo**
 - Read-only operations (fs.readFileSync) are allowed on Vercel
