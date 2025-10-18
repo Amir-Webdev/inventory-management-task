@@ -10,7 +10,6 @@ import {
   Chip,
   Stack,
   Button,
-  Box,
 } from "@mui/material";
 import AlertActions from "./AlertActions";
 
