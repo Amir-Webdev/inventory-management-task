@@ -1,17 +1,13 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   Alert,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { productFormSchema, type ProductFormInput } from "../../types";
@@ -25,7 +21,7 @@ export default function AddProduct() {
   const router = useRouter();
   const { mutateAsync: createProduct, isPending } = useCreateProduct();
   const [error, setError] = useState<string | null>(null);
-  
+
   const form = useForm<ProductFormInput, any, ProductFormInput>({
     resolver: zodResolver(productFormSchema) as any,
     defaultValues: {
@@ -39,7 +35,7 @@ export default function AddProduct() {
 
   async function onSubmit(values: ProductFormInput) {
     setError(null);
-    
+
     try {
       await createProduct(values);
       toast.success("Product created successfully!");

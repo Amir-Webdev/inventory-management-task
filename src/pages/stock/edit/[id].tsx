@@ -2,26 +2,17 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   MenuItem,
   CircularProgress,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  stockFormSchema,
-  type StockFormInput,
-  type Product,
-  type Warehouse,
-} from "../../../types";
+import { stockFormSchema, type StockFormInput } from "../../../types";
 import { useProducts } from "../../../hooks/useProducts";
 import { useWarehouses } from "../../../hooks/useWarehouses";
 import { useStockItem, useUpdateStock } from "../../../hooks/useStock";

@@ -1,27 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   MenuItem,
   Alert,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  stockFormSchema,
-  type StockFormInput,
-  type Product,
-  type Warehouse,
-} from "../../types";
+import { stockFormSchema, type StockFormInput } from "../../types";
 import { useProducts } from "../../hooks/useProducts";
 import { useWarehouses } from "../../hooks/useWarehouses";
 import { useCreateStock } from "../../hooks/useStock";
@@ -35,7 +26,7 @@ export default function AddStock() {
   const { data: warehouses = [] } = useWarehouses();
   const { mutateAsync: createStock, isPending } = useCreateStock();
   const [error, setError] = useState<string | null>(null);
-  
+
   const form = useForm<StockFormInput, any, StockFormInput>({
     resolver: zodResolver(stockFormSchema) as any,
     defaultValues: { productId: 0, warehouseId: 0, quantity: 0 },
@@ -43,7 +34,7 @@ export default function AddStock() {
 
   async function onSubmit(values: StockFormInput) {
     setError(null);
-    
+
     try {
       await createStock(values);
       toast.success("Stock record created successfully!");

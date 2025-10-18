@@ -1,17 +1,13 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   Alert,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { warehouseFormSchema, type WarehouseFormInput } from "../../types";
@@ -25,7 +21,7 @@ export default function AddWarehouse() {
   const router = useRouter();
   const { mutateAsync: createWarehouse, isPending } = useCreateWarehouse();
   const [error, setError] = useState<string | null>(null);
-  
+
   const form = useForm<WarehouseFormInput, any, WarehouseFormInput>({
     resolver: zodResolver(warehouseFormSchema) as any,
     defaultValues: {
@@ -37,7 +33,7 @@ export default function AddWarehouse() {
 
   async function onSubmit(values: WarehouseFormInput) {
     setError(null);
-    
+
     try {
       await createWarehouse(values);
       toast.success("Warehouse created successfully!");

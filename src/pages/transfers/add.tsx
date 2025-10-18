@@ -1,18 +1,14 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   MenuItem,
   Alert,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { transferFormSchema, type TransferFormInput } from "../../types";
@@ -30,7 +26,7 @@ export default function AddTransfer() {
   const { data: warehouses = [] } = useWarehouses();
   const { mutateAsync: createTransfer, isPending } = useCreateTransfer();
   const [error, setError] = useState<string | null>(null);
-  
+
   const form = useForm<TransferFormInput, any, TransferFormInput>({
     resolver: zodResolver(transferFormSchema) as any,
     defaultValues: {
@@ -46,9 +42,9 @@ export default function AddTransfer() {
       setError("Sending and receiving warehouses cannot be the same");
       return;
     }
-    
+
     setError(null);
-    
+
     try {
       await createTransfer(values);
       toast.success("Transfer created successfully!");

@@ -1,18 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  Container,
   Typography,
   TextField,
   Button,
   Box,
   Paper,
-  AppBar,
-  Toolbar,
   CircularProgress,
 } from "@mui/material";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import { productFormSchema, type ProductFormInput } from "../../../types";
 import { useProduct, useUpdateProduct } from "../../../hooks/useProducts";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import { useProducts } from "../hooks/useProducts";
 import { useWarehouses } from "../hooks/useWarehouses";
 import { useStock } from "../hooks/useStock";
@@ -11,7 +11,6 @@ import InventoryOverview from "../components/dashboard/InventoryOverview";
 import { InventoryOverviewType } from "../types";
 
 export default function Home() {
-  const theme = useTheme();
   const isNarrow = useMediaQuery("(max-width:700px)");
   const { data: products = [], isPending: productsLoading } = useProducts();
   const { data: warehouses = [], isPending: warehousesLoading } =
